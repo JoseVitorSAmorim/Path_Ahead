@@ -1,0 +1,1 @@
+from sistema import app # nossa pasta nao se chama app, entao precisa definir a entrada do aplicativo

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Feed{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-white bg-white shadow-sm sticky-top mb-4">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="#">DevNet</a>
+        <form class="d-flex ms-auto" role="search">
+            <input class="form-control bg-light border-0" type="search" placeholder="Pesquisar..." aria-label="Search">
+        </form>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row g-4">
+        
+        <div class="col-lg-3">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body text-center">
+                    <img src="https://via.placeholder.com/80" class="rounded-circle border mb-3" alt="Perfil">
+                    <h6 class="fw-bold mb-0">Nome do Usuário</h6>
+                    <p class="text-muted small">Desenvolvedor Full Stack</p>
+                    <hr>
+                    <a href="#" class="btn btn-sm btn-outline-primary w-100 fw-bold">Ver Perfil</a>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action border-0 py-3 nav-link-custom">
+                        <i class="bi bi-briefcase-fill me-2"></i> Vagas de Emprego
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action border-0 py-3 nav-link-custom">
+                        <i class="bi bi-code-slash me-2 text-success"></i> Meus Projetos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <img src="https://via.placeholder.com/40" class="rounded-circle me-2" alt="Mini">
+                        <form action="" method="POST" class="w-100">
+                            <textarea class="form-control border-0 bg-light" rows="2" placeholder="Começar publicação..."></textarea>
+                            <div class="text-end mt-2">
+                                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold">Publicar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="https://via.placeholder.com/48" class="rounded-circle me-2">
+                        <div>
+                            <h6 class="mb-0 fw-bold">Neymar Junior</h6>
+                            <small class="text-muted small">Atleta Profissional • 1h</small>
+                        </div>
+                    </div>
+                    <p class="card-text">Acabei de finalizar meu novo plano de treinamento focado em agilidade. O que acham?</p>
+                    <hr>
+                    <div class="d-flex justify-content-around text-muted fw-bold small">
+                        <div class="btn btn-light btn-sm border-0"><i class="bi bi-hand-thumbs-up"></i> Gostei</div>
+                        <div class="btn btn-light btn-sm border-0"><i class="bi bi-chat-text"></i> Comentar</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card shadow-sm p-3">
+                <h6 class="fw-bold mb-3">Vagas recomendadas</h6>
+                <div class="mb-3 small">
+                    <a href="#" class="text-decoration-none text-dark fw-bold d-block">Dev Flask Sênior</a>
+                    <span class="text-muted">São Paulo (Híbrido)</span>
+                </div>
+                <div class="mb-3 small">
+                    <a href="#" class="text-decoration-none text-dark fw-bold d-block">Analista de Sistemas</a>
+                    <span class="text-muted">Remoto</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
