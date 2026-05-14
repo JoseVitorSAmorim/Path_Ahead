@@ -17,13 +17,15 @@ class Usuario(db.Model, UserMixin): # essa tabela vai ter o login
     sobrenome = db.Column(db.String, nullable = True)
     email = db.Column(db.String, nullable = False, unique = True)
     senha = db.Column(db.String, nullable = False)
-    categoria = db.Column(db.String, nullable= False)
-
+    categoria = db.Column(db.String, nullable= False) # status - aluno, escola, empresa, funcionario
+    
 # Entidade Pai - Escola
 class Escola(db.Model):
     id = db.Column(db.Integer, primary_key = True) 
     nome = db.Column(db.String, nullable = False)
-    alunos = db.relationship('Aluno', backref="aluno", lazy=True, cascade="all, delete-orphan")
+    localizacao = db.Column(db.String, nullable = False)
+    alunos = db.relationship('Aluno', backref="alunos", lazy=True, cascade="all, delete-orphan")
+    funcionarios = db.relationship('Funcionario_Escola', backref="funcionario_escola", lazy=True, cascade="all, delete-orphan")
 
 # entidade filho - Escola/aluno
 class Aluno(db.model):
@@ -36,7 +38,7 @@ class Aluno(db.model):
     contatos = db.Column(db.String, nullable = False) # esse campo deve receber uma lista de valores
     aluno_projeto = db.relationship('Projetos', backref="aluno_projeto", lazy=True, cascade="all, delete-orphan")
     aluno_post = db.relationship('Post', backref="aluno_post", lazy=True, cascade="all, delete-orphan")
-    aluno_post = db.relationship('Indicacao', backref="aluno_indicacao", lazy=True, cascade="all, delete-orphan")
+    aluno_vagas = db.relationship('Vagas', backref="aluno_vagas", lazy=True, cascade="all, delete-orphan")
 
 # entidade filho - Escola/funcionario
 class Funcionario_Escola(db.model):
@@ -95,15 +97,5 @@ class Vagas(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     titulo = db.Column(db.String, nullable = False)
     descricao = db.Column(db.String, nullable = False)
-    id_indicacao = db.Column(db.Integer, db.ForeignKey('indicacao.id')) # 2
     id_funcionario = db.Column(db.Integer, db.ForeignKey('funcionario_empresa.id'), nullable = False)
-    vagas_indicacao = db.relationship('Indicacao', backref="vagas_indicacao", lazy=True, cascade="all, delete-orphan")
-
-# entidade Função - processo (2)
-class Indicacao(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
     id_aluno = db.Column(db.Integer, db.ForeignKey('aluno.id'), nullable = False)
-    descricao = db.Column(db.String, nullable = False)
-    id_vaga = db.Column(db.Integer, db.ForeignKey('vagas.id'), nullable = True)
-    id_funcionario = db.Column(db.Integer, db.ForeignKey('funcionario_empresa.id'), nullable = False)
-    indicacao_vaga = db.relationship('Vaga', backref="incacao_vaga", lazy=True, cascade="all, delete-orphan")
