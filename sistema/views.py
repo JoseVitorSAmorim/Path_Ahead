@@ -11,7 +11,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from sistema.models import Usuario, Escola, Aluno, Funcionario_Escola, Projetos, Post, Empresa, Funcionario_Empresa, Vagas
 
 # importando as classes de formulario
-from sistema.forms import LoginForm, CadastroForm
+from sistema.forms import LoginForm, CadastroForm, VagasForm
 
 # criando rota de login
 @app.route('/', methods=['GET', 'POST'])
@@ -53,5 +53,19 @@ def Logout():
 # criando a rota menu
 @app.route('/menu/', methods=['GET', 'POST'])
 def Menu(): 
+    form_vagas = VagasForm()
 
     return render_template('menu.html')
+
+@app.route('/vagas/', methods=['GET', 'POST'])
+@login_required
+def Vagas_Page():
+    from sistema.forms import VagasForm
+    form_vagas = VagasForm()
+    
+    # O seu processamento de banco de dados (que você comentou que fará depois) entra aqui:
+    if form_vagas.validate_on_submit():
+        form_vagas.save()
+        return redirect(url_for('Vagas_Page'))
+        
+    return render_template('vagas.html', form_vagas=form_vagas)
