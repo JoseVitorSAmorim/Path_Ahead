@@ -78,180 +78,32 @@ class LoginForm(FlaskForm):
         
 # formulario da escola
 class EscolaForm(FlaskForm):
-    nome = StringField('Nome', validators=[DataRequired()])
-    localizacao = StringField('Localização', validators=[DataRequired()])
-    contato = StringField('Contato(s)', validators=[DataRequired()])
-    btnsubmit = SubmitField('Enviar')
-
-    def save(self):
-        escola = Escola(
-            nome = self.nome.data,
-            localizacao = self.localizacao.data,
-            contato = self.contato.data
-        )
-
-        db.session.add(escola)
-        db.session.commit()
+    pass
 
 # formulario do aluno
 class AlunoForm(FlaskForm):
-    nome_completo = StringField('Nome Completo', validators=[DataRequired()])
-    id_colegio = SelectField('Informe o Colegio', validators=[DataRequired()]) # buscar todos os colegios cadastrados
-    turma = StringField('Nome Completo', validators=[DataRequired()])
-    email_aluno = StringField('Nome Completo', validators=[DataRequired()])
-    senha_aluno = PasswordField('Nome Completo', validators=[DataRequired()])
-    contatos = StringField('Nome Completo', validators=[DataRequired()])
-    btnsubmit = SubmitField('Enviar')
-
-    def validate_email(self, email):
-        if Aluno.query.filter_by(email=email.data).first(): # busca na tabela usuario, na coluna email, o email enviado
-            return ValidationError('Usuario já cadastrado com esse Email!!') # resposta do erro
-
-    def save(self):
-        senha = bcrypt.generate_password_hash(self.senha_aluno.data.encode('utf-8'))
-
-        aluno = Aluno(
-            nome_completo = self.nome_completo.data,
-            id_colegio = self.id_colegio.data,
-            turma = self.turma.data,
-            email_aluno = self.email_aluno.data,
-            senha_aluno = senha,
-            contatos = self.contatos.data,
-        )
-
-        db.session.add(aluno)
-        db.session.commit()
+    pass
 
 # formulario do funcionario_escola
 class Funcionario_EscolaForm(FlaskForm):
-    nome_completo = StringField('Nome Completo', validators=[DataRequired()])
-    id_colegio = SelectField('Informe o Colegio', validators=[DataRequired()]) # buscar todos os colegios cadastrados
-    email_funcionario = StringField('Nome Completo', validators=[DataRequired()])
-    senha_funcionario = PasswordField('Nome Completo', validators=[DataRequired()])
-    contatos = StringField('Nome Completo', validators=[DataRequired()])
-    btnsubmit = SubmitField('Enviar')
-
-    def validate_email(self, email):
-        if Funcionario_Escola.query.filter_by(email=email.data).first(): # busca na tabela usuario, na coluna email, o email enviado
-            return ValidationError('Usuario já cadastrado com esse Email!!') # resposta do erro
-    
-    def save(self):
-        senha = bcrypt.generate_password_hash(self.senha_funcionario.data.encode('utf-8'))
-
-        funcionario = Funcionario_Escola(
-            nome_completo = self.nome_completo.data,
-            id_colegio = self.id_colegio.data,
-            email_funcionario = self.email_aluno.data,
-            senha_funcionario = senha,
-            contatos = self.contatos.data,
-        )
-
-        db.session.add(funcionario)
-        db.session.commit()
+    pass
 
 # formulario de projetos
 class ProjetosForm(FlaskForm):
-    titulo = StringField('Nome Completo', validators=[DataRequired()])
-    imagem = FileField('Escolha o Arquivo', validators=[DataRequired()])
-    descricao = StringField('Nome Completo', validators=[DataRequired()])
-    id_aluno = SelectField('Informe o Colegio', validators=[DataRequired()]) # buscar todos os alunos cadastrados
-    id_funcionario_escola = SelectField('Informe o Colegio', validators=[DataRequired()]) # buscar funcionarios os colegios cadastrados
-    btnsubmit = SubmitField('Enviar')
-
-    def save(self):
-        projeto = Projetos(
-            titulo = self.titulo.data,
-            imagem = self.imagem.data,
-            descricao = self.descricao.data,
-            id_aluno = self.id_aluno.data,
-            id_funcionario_escola = self.id_funcionario_escola.data
-        )
-
-        db.session.add(projeto)
-        db.session.commit()
+    pass
 
 # formulario de post
 class PostForm(FlaskForm):
-    titulo = StringField('Nome Completo', validators=[DataRequired()])
-    imagem = FileField('Escolha o Arquivo', validators=[DataRequired()])
-    descricao = StringField('Nome Completo', validators=[DataRequired()])
-    id_aluno = SelectField('Informe o Colegio', validators=[DataRequired()]) # buscar todos os alunos cadastrados
-    id_funcionario_escola = SelectField('Informe o Colegio', validators=[DataRequired()]) # buscar funcionarios os colegios cadastrados
-    id_projeto = SelectField('Informe o Projeto', validators=[DataRequired()]) # buscar todos os projetos cadastrados
-    btnsubmit = SubmitField('Enviar')
-
-    def save(self):
-        post = Post(
-            titulo = self.titulo.data,
-            imagem = self.imagem.data,
-            descricao = self.descricao.data,
-            id_aluno = self.id_aluno.data,
-            id_funcionario_escola = self.id_funcionario_escola.data,
-            id_projetos = self.id_projeto.data
-        )
-
-        db.session.add(post)
-        db.session.commit()
+    pass
 
 # formulario da empresa
 class EmpresaForm(FlaskForm):
-    nome = StringField('Nome', validators=[DataRequired()])
-    localizacao = StringField('Localização', validators=[DataRequired()])
-    contato = StringField('Contato(s)', validators=[DataRequired()])
-    btnsubmit = SubmitField('Enviar')
-
-    def save(self):
-        empresa = Empresa(
-            nome = self.nome.data,
-            localizacao = self.localizacao.data,
-            contato = self.contato.data
-        )
-
-        db.session.add(empresa)
-        db.session.commit()
+    pass
 
 # formulario do funcionario_empresa
 class Funcionario_EmpresaForm(FlaskForm):
-    nome_completo = StringField('Nome Completo', validators=[DataRequired()])
-    id_empresa = SelectField('Informe a Empresa', validators=[DataRequired()]) # buscar todos as empresas cadastradas
-    email_funcionario = StringField('Nome Completo', validators=[DataRequired()])
-    senha_funcionario = PasswordField('Nome Completo', validators=[DataRequired()])
-    contatos = StringField('Nome Completo', validators=[DataRequired()])
-    btnsubmit = SubmitField('Enviar')
-
-    def validate_email(self, email):
-        if Funcionario_Empresa.query.filter_by(email=email.data).first(): # busca na tabela usuario, na coluna email, o email enviado
-            return ValidationError('Usuario já cadastrado com esse Email!!') # resposta do erro
-    
-    def save(self):
-        senha = bcrypt.generate_password_hash(self.senha_funcionario.data.encode('utf-8'))
-
-        funcionario = Funcionario_Escola(
-            nome_completo = self.nome_completo.data,
-            id_empresa = self.id_colegio.data,
-            email_funcionario = self.email_aluno.data,
-            senha_funcionario = senha,
-            contatos = self.contatos.data,
-        )
-
-        db.session.add(funcionario)
-        db.session.commit()
+    pass
 
 # formulario de vagas
 class VagasForm(FlaskForm):
-    titulo = StringField('Nome Completo', validators=[DataRequired()])
-    descricao = StringField('Nome Completo', validators=[DataRequired()])
-    id_funcionario_empresa = SelectField('Informe o Funcionario', validators=[DataRequired()]) # buscar funcionarios da empresa cadastrados
-    id_aluno = SelectField('Informe o Aluno', validators=[DataRequired()]) # buscar os alunos cadastrados
-    btnsubmit = SubmitField('Enviar')
-
-    def save(self):
-        vaga = Vagas(
-            titulo = self.titulo.data,
-            descricao = self.descricao.data,
-            id_funcionario = self.id_funcionario_empresa,
-            id_aluno = self.id_aluno.data
-        )
-
-        db.session.add(vaga)
-        db.session.commit()
+   pass
