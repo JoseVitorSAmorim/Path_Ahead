@@ -12,7 +12,7 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 
 # importando as tabelas e o db
 from sistema import db, bcrypt, app
-from sistema.models import Usuario, Escola, Aluno, Funcionario_Escola, Projetos, Post, Empresa, Funcionario_Empresa, Vagas # importar as tabelas do models
+from sistema.models import Usuario, Escola, Aluno, FuncionarioEscola, Projetos, Post, Empresa, FuncionarioEmpresa, Vagas # importar as tabelas do models
 
 # biblioteca usada pra salvar arquivo 
 import os
@@ -24,6 +24,7 @@ from werkzeug.utils import secure_filename
 class CadastroForm(FlaskForm):
     nome = StringField('Nome', validators=[DataRequired()])
     sobrenome = StringField('Sobrenome', validators=[DataRequired()])
+    categoria = SelectField('Escolha uma Categoria', choices=['Aluno', 'Admin', 'Escola', 'Empresa', 'Funcionario/Escola', 'Funcionario/Empresa'])
     email = EmailField('Email', validators=[DataRequired(), Email()])
     senha = PasswordField('Senha', validators=[DataRequired()])
     confirmacao_senha = PasswordField('Confirmar Senha', validators=[DataRequired(), EqualTo('senha')])
@@ -32,8 +33,17 @@ class CadastroForm(FlaskForm):
     # criando o validador
     def validate_email(self, email):
         if Usuario.query.filter_by(email=email.data).first(): # busca na tabela usuario, na coluna email, o email enviado
-            return ValidationError('Usuario já cadastrado com esse Email!!') # resposta do erro
+            raise ValidationError('Usuario já cadastrado com esse Email!!') # resposta do erro
 
+    def validate_nome(self, nome): 
+        if self.categoria.data.lower() == 'admin':
+            if Usuario.query.filter(Usuario.nome.ilike('admin')).first():
+                raise ValidationError('Admin já cadastrado no sistema!!!')
+
+        if self.categoria.data == 'Empresa':
+            if Usuario.query.filter(Usuario.nome.like(nome.data)).first():
+                raise ValidationError('Empresa já cadastrada com esse nome!!!')
+        
     # criando o save
     def save(self):
         # criptografando a senha
@@ -44,7 +54,8 @@ class CadastroForm(FlaskForm):
             nome = self.nome.data,
             sobrenome = self.sobrenome.data,
             email = self.email.data,
-            senha = senha
+            senha = senha,
+            categoria = self.categoria.data
         )
 
         # salvando
@@ -85,7 +96,7 @@ class AlunoForm(FlaskForm):
     pass
 
 # formulario do funcionario_escola
-class Funcionario_EscolaForm(FlaskForm):
+class FuncionarioEscolaForm(FlaskForm):
     pass
 
 # formulario de projetos
@@ -101,7 +112,7 @@ class EmpresaForm(FlaskForm):
     pass
 
 # formulario do funcionario_empresa
-class Funcionario_EmpresaForm(FlaskForm):
+class FuncionarioEmpresaForm(FlaskForm):
     pass
 
 # formulario de vagas

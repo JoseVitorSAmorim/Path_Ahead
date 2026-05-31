@@ -8,7 +8,7 @@ from flask import render_template, url_for, request, redirect, flash
 from flask_login import login_user, logout_user, current_user, login_required
 
 # importando a classe da tabela onde vou salvar
-from sistema.models import Usuario, Escola, Aluno, Funcionario_Escola, Projetos, Post, Empresa, Funcionario_Empresa, Vagas
+from sistema.models import Usuario, Escola, Aluno, FuncionarioEscola, Projetos, Post, Empresa, FuncionarioEmpresa, Vagas
 
 # importando as classes de formulario
 from sistema.forms import LoginForm, CadastroForm, VagasForm
@@ -45,6 +45,7 @@ def Login():
 
 # criando o logout(sair)
 @app.route('/sair/')
+@login_required
 def Logout():
     logout_user()
     

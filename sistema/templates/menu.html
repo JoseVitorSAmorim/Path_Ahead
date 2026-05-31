@@ -3,5 +3,17 @@
 {% block titulo %} Painel Administrativo {% endblock %}
 
 {% block content %}
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('Logout') }}" class="btn btn-danger">Sair</a>
+    {% endif %}
+    
+    <hr>
+
     <h1>pagina menu</h1>
+
+    <hr>
+
+    <section class="Post">
+        <h2>Post</h2>
+    </section>
 {% endblock %}

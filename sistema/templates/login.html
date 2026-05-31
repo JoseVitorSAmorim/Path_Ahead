@@ -72,6 +72,10 @@
                         {{ form_cadastro.email(class="form-control", placeholder="nome@exemplo.com") }}
                     </div>
                     <div class="mb-3">
+                        {{ form_cadastro.categoria.label(class="form-label small fw-semibold") }}
+                        {{ form_cadastro.categoria(class="form-control", placeholder="Crie uma senha forte") }}
+                    </div>
+                    <div class="mb-3">
                         {{ form_cadastro.senha.label(class="form-label small fw-semibold") }}
                         {{ form_cadastro.senha(class="form-control", placeholder="Crie uma senha forte") }}
                     </div>
