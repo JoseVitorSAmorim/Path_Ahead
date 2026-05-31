@@ -10,10 +10,86 @@
     <hr>
 
     <h1>pagina menu</h1>
-
+    <p>Usuario atual</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Categoria</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ current_user.nome }}</td>
+                <td>{{ current_user.categoria }}</td>
+            </tr>
+        </tbody>
+    </table>
     <hr>
 
     <section class="Post">
         <h2>Post</h2>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#post_modal">
+            Fazer Post
+        </button>
+
+        <div class="modal fade" id="post_modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- cabeça modal -->
+                    <div class="modal-header" style="background-color: green;">
+                        <h5 class="modal-title">Faça um Post🔽</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <!-- corpo modal -->
+                    <div class="modal-body" style="background-color: antiquewhite;">
+                        <form action="" method="post">
+                            {{ form_post.csrf_token }}
+
+                            {{ form_post.titulo.label(class="form-label small fw-semibold") }}
+                            {{ form_post.titulo(class="form-control") }}
+
+                            {{ form_post.descricao.label(class="form-label small fw-semibold") }}
+                            {{ form_post.descricao(class="form-control") }}
+
+                            {{ form_post.escola.label(class="form-label small fw-semibold") }}
+                            {{ form_post.escola(class="form-control") }}
+
+                            {{ form_post.btnsubmit(class="btn btn-success mt-4 w-100") }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- links -->
+    <hr>
+    <section>
+        <h1>Links</h1>
+        {% if current_user.categoria.lower() in ['admin'] %}
+            <button class="btn btn-primary gap-2">Cadastrar Escola</button>
+            <button class="btn btn-primary gap-2">Cadastrar Empresa</button>
+            <button class="btn btn-primary gap-2">Cadastrar Aluno</button>
+            <button class="btn btn-primary gap-2">Cadastrar Funcionario/Escola</button>
+            <button class="btn btn-primary gap-2">Cadastrar Funcionario/Empresa</button>
+        {% elif current_user.categoria.lower() in ['escola'] %}
+            <button class="btn btn-primary gap-2">Cadastrar Aluno</button>
+            <button class="btn btn-primary gap-2">Cadastrar Funcionario/Escola</button>
+        {% elif current_user.categoria.lower() in ['empresa'] %}
+            <button class="btn btn-primary gap-2">Cadastrar Funcionario/Empresa</button>
+        {% endif %}
+        
+        <a href="{{ url_for('Vagas_Page') }}">Vagas</a>
+        <a href="{{ url_for('Projetos_Page') }}">Projetos</a>
+        <a href="{{ url_for('Perfil_Page') }}">Perfil</a>
     </section>
 {% endblock %}
+
+<!-- 
+        os usuarios
+1 -> fer@gmail.com: aluno
+2 -> marechal.rondon@gmail.com: escola
+3 -> gabriel@gmail.com: admin
+-->

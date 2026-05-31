@@ -2,7 +2,7 @@
 from flask_wtf import FlaskForm
 
 # importando o tipo de campo e os validators
-from wtforms import StringField, EmailField, PasswordField, SubmitField, PasswordField, IntegerField, SelectField
+from wtforms import StringField, EmailField, PasswordField, SubmitField, PasswordField, IntegerField, SelectField, TextAreaField
 
 # importando os campos de arquivo
 from flask_wtf.file import FileField, FileAllowed
@@ -105,7 +105,21 @@ class ProjetosForm(FlaskForm):
 
 # formulario de post
 class PostForm(FlaskForm):
-    pass
+    titulo = StringField('Titulo', validators=[DataRequired()])
+    descricao = TextAreaField('Descrição', validators=[DataRequired()])
+    escola = SelectField('Selecione a Escola', coerce=int, validators=[DataRequired()])
+    btnsubmit = SubmitField('Postar')
+    
+    def save(self):
+        post = Post(
+            titulo = self.titulo.data,
+            descricao = self.descricao.data,
+            id_escola = self.escola.data
+        )
+    
+        # salvando no db
+        db.session.add(post)
+        db.session.commit()
 
 # formulario da empresa
 class EmpresaForm(FlaskForm):

@@ -11,7 +11,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from sistema.models import Usuario, Escola, Aluno, FuncionarioEscola, Projetos, Post, Empresa, FuncionarioEmpresa, Vagas
 
 # importando as classes de formulario
-from sistema.forms import LoginForm, CadastroForm, VagasForm
+from sistema.forms import LoginForm, CadastroForm, VagasForm, PostForm, EmpresaForm, AlunoForm, EscolaForm, ProjetosForm, FuncionarioEscolaForm, FuncionarioEmpresaForm
 
 # criando rota de login
 @app.route('/', methods=['GET', 'POST'])
@@ -53,15 +53,25 @@ def Logout():
 
 # criando a rota menu
 @app.route('/menu/', methods=['GET', 'POST'])
+@login_required
 def Menu(): 
-    form_vagas = VagasForm()
+    form_post = PostForm()
 
-    return render_template('menu.html')
+    escolas = Escola.query.all()
 
+    form_post.escola.choices = [(escola.id, escola.nome) for escola in escolas]
+
+    if form_post.validate_on_submit():
+        form_post.save()
+        print('post criado com sucesso')
+        return redirect(url_for('Menu'))
+    
+    return render_template('menu.html', form_post = form_post)
+
+# criando a rota vagas
 @app.route('/vagas/', methods=['GET', 'POST'])
 @login_required
 def Vagas_Page():
-    from sistema.forms import VagasForm
     form_vagas = VagasForm()
     
     # O seu processamento de banco de dados (que você comentou que fará depois) entra aqui:
@@ -70,3 +80,18 @@ def Vagas_Page():
         return redirect(url_for('Vagas_Page'))
         
     return render_template('vagas.html', form_vagas=form_vagas)
+
+# criando a rota projetos
+@app.route('/projetos/', methods=['GET', 'POST'])
+@login_required
+def Projetos_Page():
+    
+    return f"<h1>Pagina Projetos</h1>"
+
+# criando a rota perfil
+@app.route('/perfil/', methods=['GET', 'POST'])
+@login_required
+def Perfil_Page():
+    
+    return f"<h1>Pagina Perfil</h1>"
+

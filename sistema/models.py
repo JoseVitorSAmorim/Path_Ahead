@@ -65,7 +65,7 @@ class Projetos(db.Model):
     titulo = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.Text, nullable=False)
     data_postagem = db.Column(db.Date, default=datetime.utcnow)
-    imagem = db.Column(db.String, nullable=True)
+    imagem = db.Column(db.String, nullable=False, default = 'default.png')
     
     # Chave estrangeira correta: o Projeto pertence a uma Escola
     id_escola = db.Column(db.Integer, db.ForeignKey('escola.id'), nullable=False)
