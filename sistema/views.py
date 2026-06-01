@@ -56,17 +56,101 @@ def Logout():
 @login_required
 def Menu(): 
     form_post = PostForm()
+    form_escola = EscolaForm()
+    form_empresa = EmpresaForm()
+    form_aluno = AlunoForm()
+    form_funcionario_escola = FuncionarioEscolaForm()
+    form_funcionario_empresa = FuncionarioEmpresaForm()
+    form_vagas = VagasForm()
 
+    # buscando os post
+    posts = Post.query.all()
+
+    # buscando as escolas
     escolas = Escola.query.all()
 
+    # buscando os alunos
+    alunos = Aluno.query.all()
+
+    # buscando as empresas 
+    empresas = Empresa.query.all()
+
+    # buscando os funcionarios escolas
+    funcionarios_escola = FuncionarioEscola.query.all()
+
+    # buscando os funcionarios empresas
+    funcionarios_empresa = FuncionarioEmpresa.query.all()
+    
+    # buscando as vagas postadas
+    vagas_postadas = Vagas.query.all()
+
+    # abastecendo o choices do select field
     form_post.escola.choices = [(escola.id, escola.nome) for escola in escolas]
+
+    # abastecendo o form aluno
+    form_aluno.escola.choices = [(escola.id, escola.nome) for escola in escolas]
+
+    # abastecendo o form funcionario/escola
+    form_funcionario_escola.escola.choices = [(escola.id, escola.nome) for escola in escolas]
+
+    # abastecendo o form funcionario/empresa
+    form_funcionario_empresa.empresa.choices = [(empresa.id, empresa.nome) for empresa in empresas]
+
+    # abastecendo o form vagas
+    form_vagas.empresa.choices = [(empresa.id, empresa.nome) for empresa in empresas]
 
     if form_post.validate_on_submit():
         form_post.save()
         print('post criado com sucesso')
         return redirect(url_for('Menu'))
     
-    return render_template('menu.html', form_post = form_post)
+    if form_escola.validate_on_submit() and form_escola.btn_escola.data:
+        form_escola.save()
+        print('Escola cadastrada com sucesso')
+        return redirect(url_for('Menu'))
+
+    elif form_aluno.validate_on_submit():
+        form_aluno.save()
+        print('Aluno criado com sucesso')
+        return redirect(url_for('Menu'))
+    
+    if form_empresa.validate_on_submit() and form_empresa.btn_empresa.data:
+        form_empresa.save() # Chamado APENAS UMA VEZ
+        print('Empresa cadastrada com sucesso')
+        return redirect(url_for('Menu'))
+
+    if form_funcionario_escola.validate_on_submit() and form_funcionario_escola.btn_funcionario_escola.data:
+        form_funcionario_escola.save()
+        print('Funcionario cadastrado na escola com sucesso')
+        return redirect(url_for('Menu'))
+    
+    if form_funcionario_empresa.validate_on_submit() and form_funcionario_empresa.btn_funcionario_empresa.data:
+        form_funcionario_empresa.save()
+        print('Funcionario Cadastrado na empresa com sucesso')
+        return redirect(url_for('Menu'))
+
+    if form_vagas.validate_on_submit() and form_vagas.btn_vaga.data:
+        form_vagas.save()
+        print('Vaga postada com sucesso')
+        return redirect(url_for('Menu'))
+    
+    return render_template(
+        'menu.html', 
+        form_post = form_post, 
+        form_escola = form_escola, 
+        posts = posts, 
+        form_empresa = form_empresa, 
+        form_aluno = form_aluno, 
+        form_funcionario_escola = form_funcionario_escola, 
+        form_funcionario_empresa = form_funcionario_empresa,
+        alunos = alunos,
+        empresas = empresas,
+        escolas = escolas,
+        funcionarios_escola = funcionarios_escola,
+        funcionarios_empresa = funcionarios_empresa,
+        form_vagas = form_vagas,
+        vagas_postadas = vagas_postadas
+        )
 
 # criando a rota vagas
 @app.route('/vagas/', methods=['GET', 'POST'])

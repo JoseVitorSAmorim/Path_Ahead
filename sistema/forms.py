@@ -89,15 +89,82 @@ class LoginForm(FlaskForm):
         
 # formulario da escola
 class EscolaForm(FlaskForm):
-    pass
+    nome = StringField('Nome da Escola', validators=[DataRequired()])
+    localizacao = StringField('Localização da Escola', validators=[DataRequired()])
+    contato = TextAreaField('Contato(s)', validators=[DataRequired()])
+    btn_escola = SubmitField('Cadastrar')
+
+    def save(self):
+        escola = Escola(
+            nome = self.nome.data,
+            localizacao = self.localizacao.data,
+            contato = self.contato.data
+        )
+
+        db.session.add(escola)
+        db.session.commit()
 
 # formulario do aluno
 class AlunoForm(FlaskForm):
-    pass
+    nome = StringField('Nome Aluno', validators=[DataRequired()])
+    turma = SelectField('Turma', choices=['Regular', 'Tecnico'])
+    email = EmailField('Email', validators=[Email(), DataRequired()])
+    senha = PasswordField('Senha', validators=[DataRequired()])
+    contato = TextAreaField('Contato(s)', validators=[DataRequired()])
+    escola = SelectField('Colegio', coerce=int, validators=[DataRequired()])
+    btnsubmit = SubmitField('Cadastrar')
+
+    # criando o validador
+    def validate_email(self, email):
+        if Usuario.query.filter_by(email=email.data).first(): # busca na tabela usuario, na coluna email, o email enviado
+            raise ValidationError('Usuario já cadastrado com esse Email!!') # resposta do erro
+
+    def save(self):
+        # criptografando a senha
+        senha = bcrypt.generate_password_hash(self.senha.data.encode('utf-8'))
+
+        aluno = Aluno(
+            nome = self.nome.data,
+            turma = self.turma.data,
+            email = self.email.data,
+            senha = senha,
+            contato = self.contato.data,
+            id_colegio = self.escola.data
+        )
+
+        db.session.add(aluno)
+        db.session.commit()
 
 # formulario do funcionario_escola
 class FuncionarioEscolaForm(FlaskForm):
-    pass
+    nome = StringField('Nome', validators=[DataRequired()])
+    cargo = SelectField('Cargo', choices=['Diretor', 'Vice-Diretor', 'Coordenador ou Pedagogo', 'Orientador Educacional', 'Professor/Docente', 'Supervisor Educacional', 'Auxiliar de Educação Especial / Cuidador', 'Psicopedagogo', 'Secretário Escolar', 'Inspetor de Alunos', 'Merendeiro', 'Equipe de Limpeza e Manutenção', 'Porteiro'])
+    email = EmailField('Email', validators=[Email(), DataRequired()])
+    senha = PasswordField('Senha', validators=[DataRequired()])
+    contato = TextAreaField('Contato(s)', validators=[DataRequired()])
+    escola = SelectField('Escola', coerce=int, validators=[DataRequired()])
+    btn_funcionario_escola = SubmitField('Cadastrar')
+    
+    # criando o validador
+    def validate_email(self, email):
+        if Usuario.query.filter_by(email=email.data).first(): # busca na tabela usuario, na coluna email, o email enviado
+            raise ValidationError('Usuario já cadastrado com esse Email!!') # resposta do erro
+        
+    def save(self):
+        # criptografando a senha
+        senha = bcrypt.generate_password_hash(self.senha.data.encode('utf-8'))
+
+        funcionario = FuncionarioEscola(
+            nome = self.nome.data,
+            cargo = self.cargo.data,
+            email = self.email.data,
+            senha = senha,
+            contato = self.contato.data,
+            id_colegio = self.escola.data
+        )
+
+        db.session.add(funcionario)
+        db.session.commit()
 
 # formulario de projetos
 class ProjetosForm(FlaskForm):
@@ -123,12 +190,64 @@ class PostForm(FlaskForm):
 
 # formulario da empresa
 class EmpresaForm(FlaskForm):
-    pass
+    nome = StringField('Nome da Empresa', validators=[DataRequired()])
+    localizacao = StringField('Localização', validators=[DataRequired()])
+    contato = TextAreaField('Contato(s)', validators=[DataRequired()])
+    btn_empresa = SubmitField('Cadastrar')
+
+    def save(self):
+        empresa = Empresa(
+            nome = self.nome.data,
+            localizacao = self.localizacao.data,
+            contato = self.contato.data
+        )
+
+        db.session.add(empresa)
+        db.session.commit()
 
 # formulario do funcionario_empresa
 class FuncionarioEmpresaForm(FlaskForm):
-    pass
+    nome = StringField('Nome', validators=[DataRequired()])
+    cargo = SelectField('Cargo', choices=['Proprietário / Dono', 'Sócio', 'Diretor', 'Gerente', 'Supervisor / Coordenador', 'Líder de Equipe', 'Funcionário / Colaborador', 'Atendente / Vendedor', 'Assistente / Auxiliar', 'Estagiário / Jovem Aprendiz', 'Terceirizado / Prestador de Serviços'], validators=[DataRequired()])
+    email = EmailField('Email', validators=[Email(), DataRequired()])
+    senha = PasswordField('Senha', validators=[DataRequired()])
+    contato = TextAreaField('Contato(s)', validators=[DataRequired()])
+    empresa = SelectField('Empresa', coerce=int, validators=[DataRequired()])
+    btn_funcionario_empresa = SubmitField('Cadastrar')
 
+    # criando o validador
+    def validate_email(self, email):
+        if Usuario.query.filter_by(email=email.data).first(): # busca na tabela usuario, na coluna email, o email enviado
+            raise ValidationError('Usuario já cadastrado com esse Email!!') # resposta do erro
+        
+    def save(self):
+        # criptografando a senha
+        senha = bcrypt.generate_password_hash(self.senha.data.encode('utf-8'))
+
+        funcionario = FuncionarioEmpresa(
+            nome = self.nome.data,
+            cargo = self.cargo.data,
+            email = self.email.data,
+            senha = senha,
+            contato = self.contato.data,
+            id_empresa = self.empresa.data
+        )
+
+        db.session.add(funcionario)
+        db.session.commit()
 # formulario de vagas
 class VagasForm(FlaskForm):
-   pass
+   titulo = StringField('Titulo da Vaga', validators=[DataRequired()])
+   descricao = TextAreaField('Descrição da Vaga', validators=[DataRequired()])
+   empresa = SelectField('Empresa responsavel', coerce=int, validators=[DataRequired()])
+   btn_vaga = SubmitField('Postar') 
+   
+   def save(self):
+       vaga = Vagas(
+           titulo = self.titulo.data,
+           descricao = self.descricao.data,
+           id_empresa = self.empresa.data
+       )
+
+       db.session.add(vaga)
+       db.session.commit()
