@@ -8,10 +8,10 @@ from flask import render_template, url_for, request, redirect, flash
 from flask_login import login_user, logout_user, current_user, login_required
 
 # importando a classe da tabela onde vou salvar
-from sistema.models import Usuario, Escola, Aluno, FuncionarioEscola, Projetos, Post, Empresa, FuncionarioEmpresa, Vagas
+from sistema.models import Usuario, Escola, Aluno, FuncionarioEscola, Projetos, Post, Empresa, FuncionarioEmpresa, Vagas, Indicacao
 
 # importando as classes de formulario
-from sistema.forms import LoginForm, CadastroForm, VagasForm, PostForm, EmpresaForm, AlunoForm, EscolaForm, ProjetosForm, FuncionarioEscolaForm, FuncionarioEmpresaForm
+from sistema.forms import LoginForm, CadastroForm, VagasForm, PostForm, EmpresaForm, AlunoForm, EscolaForm, ProjetosForm, FuncionarioEscolaForm, FuncionarioEmpresaForm, IndicacaoForm
 
 # criando rota de login
 @app.route('/', methods=['GET', 'POST'])
@@ -62,6 +62,7 @@ def Menu():
     form_funcionario_escola = FuncionarioEscolaForm()
     form_funcionario_empresa = FuncionarioEmpresaForm()
     form_vagas = VagasForm()
+    form_indicacao = IndicacaoForm()
 
     # buscando os post
     posts = Post.query.all()
@@ -84,6 +85,14 @@ def Menu():
     # buscando as vagas postadas
     vagas_postadas = Vagas.query.all()
 
+    # buscando os alunos indicados
+    inscritos = Indicacao.query.filter(Indicacao.status == 'Candidatar-se').all()
+
+    print('INSCRITOS', inscritos)
+    # buscando os alunos inscritos
+    indicados = Indicacao.query.filter(Indicacao.status == 'Indicar').all()
+
+    print('INDICADOS', indicados)
     # abastecendo o choices do select field
     form_post.escola.choices = [(escola.id, escola.nome) for escola in escolas]
 
@@ -98,6 +107,15 @@ def Menu():
 
     # abastecendo o form vagas
     form_vagas.empresa.choices = [(empresa.id, empresa.nome) for empresa in empresas]
+
+    # abastecendo o form indicacao label indicado
+    form_indicacao.indicado.choices = [(indicado.id, indicado.nome) for indicado in alunos]
+
+    # abastecendo o form indicacao label vaga
+    form_indicacao.vaga.choices = [(vaga.id, vaga.titulo) for vaga in vagas_postadas]
+
+    # abastecendo o form indicacao label escola
+    form_indicacao.escola.choices = [(escola.id, escola.nome) for escola in escolas]
 
     if form_post.validate_on_submit():
         form_post.save()
@@ -134,6 +152,16 @@ def Menu():
         print('Vaga postada com sucesso')
         return redirect(url_for('Menu'))
     
+    if form_indicacao.validate_on_submit() and form_indicacao.btn_indicacao.data:
+        form_indicacao.save()
+        print('Aluno indicado com sucesso')
+        return redirect(url_for('Menu'))
+    
+    if form_indicacao.validate_on_submit() and form_indicacao.btn_candidatar.data:
+        form_indicacao.save(aluno_logado_id=current_user.id)
+        print('Aluno inscrito com sucesso')
+        return redirect(url_for('Menu'))
+    
     return render_template(
         'menu.html', 
         form_post = form_post, 
@@ -149,7 +177,10 @@ def Menu():
         funcionarios_escola = funcionarios_escola,
         funcionarios_empresa = funcionarios_empresa,
         form_vagas = form_vagas,
-        vagas_postadas = vagas_postadas
+        vagas_postadas = vagas_postadas,
+        form_indicacao = form_indicacao,
+        indicados = indicados,
+        inscritos = inscritos
         )
 
 # criando a rota vagas

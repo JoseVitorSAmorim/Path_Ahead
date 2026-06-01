@@ -372,6 +372,57 @@
 
                     <p>Dono do post🔽</p>
                     <span class="fs-3">{{ vaga.empresa_vagas.nome }}</span>
+
+                    <hr>
+
+                    {% if current_user.categoria.lower() == 'aluno' %}
+                        <button>Se Candidatar</button>
+                    {% elif current_user.categoria.lower() == 'funcionario' %}
+                        <button>Indicar</button>
+                    {% endif %}
+
+                    {% if current_user.categoria.lower() == 'admin' %}
+                        <!-- trigger -->
+                        <button class="btn btn-primary" tabindex="-1" data-bs-toggle="modal" data-bs-target="#indicacao_modal">
+                            Indicar/candidatar-se
+                        </button>
+
+                        <!-- modal -->
+                        <div class="modal fade" id="indicacao_modal">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <!-- cabeçalho -->
+                                    <div class="modal-header bg-primary">
+                                        <h5>Indicando Alguem</h5>
+                                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+
+                                    <!-- corpo -->
+                                    <div class="modal-body">
+                                        <!-- formulario respectivo -->
+                                        <form action="" method="post">
+                                            {{ form_indicacao.csrf_token }}
+
+                                            {{ form_indicacao.escola.label(class="form-label small fw-semibold") }}
+                                            {{ form_indicacao.escola(class="form-control")}}
+
+                                            {{ form_indicacao.status.label(class="form-label small fw-semibold") }}
+                                            {{ form_indicacao.status(class="form-control")}}
+
+                                            {{ form_indicacao.indicado.label(class="form-label small fw-semibold") }}
+                                            {{ form_indicacao.indicado(class="form-control")}}
+
+                                            {{ form_indicacao.vaga.label(class="form-label small fw-semibold") }}
+                                            {{ form_indicacao.vaga(class="form-control")}}
+
+                                            {{ form_indicacao.btn_indicacao(class="btn btn-primary w-100 mt-4")}}
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -507,6 +558,55 @@
                         <td>{{ funcionario.empresa_funcionario.nome }}</td>
                     {% endfor %}
                 </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <hr>
+
+    <section>
+        <h1>Alunos inscritos:</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Escola</th>
+                    <th>Vaga</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for inscrito in inscritos %}
+                    <tr>
+                        <td>{{ inscrito.rel_aluno.nome }}</td>
+                        <td>{{ inscrito.rel_escola.nome }}</td>
+                        <td>{{ inscrito.rel_vaga.titulo }}</td>
+                        <td>{{ inscrito.status }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+
+        <h1>Alunos Indicados:</h1>
+        <table class="table">
+            <thead>
+                <th>Nome</th>
+                <th>Escola</th>
+                <th>Vaga</th>
+                <th>Status</th>
+            </thead>
+
+            <tbody>
+                {% for indicado in indicados %}
+                    <tr>
+                        <td>{{ indicado.rel_aluno.nome }}</td>
+                        <td>{{ indicado.rel_escola.nome }}</td>
+                        <td>{{ indicado.rel_vaga.titulo }}</td>
+                        <td>{{ indicado.status }}</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </section>

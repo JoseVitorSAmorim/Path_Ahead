@@ -47,6 +47,9 @@ class Aluno(db.Model):
     # Chave estrangeira correta: o Aluno pertence a uma Escola
     id_colegio = db.Column(db.Integer, db.ForeignKey('escola.id'), nullable=False)
 
+    # Relacionamentos lógicos (Um aluno tem varias indicações)
+    indicado = db.relationship('Indicacao', backref = 'indicacao_aluno', lazy = True, cascade='all, delete-orphan')
+    
 class FuncionarioEscola(db.Model):
     __tablename__ = 'funcionario_escola'
     id = db.Column(db.Integer, primary_key=True)
@@ -126,6 +129,12 @@ class Indicacao(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.String(20), nullable=False) # inscrito, indicado, etc.
     
+
     # Chaves estrangeiras da tabela intermediária (Quem indicou e para qual vaga)
     id_escola = db.Column(db.Integer, db.ForeignKey('escola.id'), nullable=False)
     id_vaga = db.Column(db.Integer, db.ForeignKey('vagas.id'), nullable=False)
+    id_aluno = db.Column(db.Integer, db.ForeignKey('aluno.id'), nullable = True)
+
+    rel_escola = db.relationship('Escola', foreign_keys=[id_escola])
+    rel_vaga = db.relationship('Vagas', foreign_keys=[id_vaga])
+    rel_aluno = db.relationship('Aluno', foreign_keys=[id_aluno])

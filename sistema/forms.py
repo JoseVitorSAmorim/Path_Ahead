@@ -12,7 +12,7 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 
 # importando as tabelas e o db
 from sistema import db, bcrypt, app
-from sistema.models import Usuario, Escola, Aluno, FuncionarioEscola, Projetos, Post, Empresa, FuncionarioEmpresa, Vagas # importar as tabelas do models
+from sistema.models import Usuario, Escola, Aluno, FuncionarioEscola, Projetos, Post, Empresa, FuncionarioEmpresa, Vagas, Indicacao # importar as tabelas do models
 
 # biblioteca usada pra salvar arquivo 
 import os
@@ -241,7 +241,7 @@ class VagasForm(FlaskForm):
    descricao = TextAreaField('Descrição da Vaga', validators=[DataRequired()])
    empresa = SelectField('Empresa responsavel', coerce=int, validators=[DataRequired()])
    btn_vaga = SubmitField('Postar') 
-   
+
    def save(self):
        vaga = Vagas(
            titulo = self.titulo.data,
@@ -251,3 +251,29 @@ class VagasForm(FlaskForm):
 
        db.session.add(vaga)
        db.session.commit()
+
+# formulario de indicação
+class IndicacaoForm(FlaskForm):
+    status = SelectField('Qual tipo de inscrição?', choices=['Candidatar-se', 'Indicar'] ,validators=[DataRequired()])
+    escola = SelectField('Qual sua Escola?', validators=[DataRequired()])
+    indicado = SelectField('Quem vai ser indicado?', coerce=int, default=None)
+    vaga = SelectField('Qual a vaga escolhida?', validators=[DataRequired()])
+    btn_indicacao = SubmitField('Indicar')
+    btn_candidatar = SubmitField('Candidatar-se')
+
+    def save(self, aluno_logado_id=None):
+        id_aluno_final = self.indicado.data
+        
+        # Se for auto-candidatura, o ID do aluno é o do próprio usuário logado
+        if self.status.data == 'Candidatar-se' and aluno_logado_id:
+            id_aluno_final = aluno_logado_id
+
+        indicacao = Indicacao(
+            status=self.status.data,
+            id_escola=self.escola.data,
+            id_vaga=self.vaga.data,
+            id_aluno=id_aluno_final
+        )
+
+        db.session.add(indicacao)
+        db.session.commit()
