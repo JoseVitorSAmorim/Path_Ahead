@@ -1,700 +1,134 @@
 {% extends 'base.html' %}
 
-{% block titulo %} Painel Administrativo {% endblock %}
+{% block titulo %}Feed - DevNetwork{% endblock %}
 
 {% block content %}
-    {% if current_user.is_authenticated %}
-        <a href="{{ url_for('Logout') }}" class="btn btn-danger">Sair</a>
-    {% endif %}
-    
-    <hr>
-
-    <h1>pagina menu</h1>
-    <p>Usuario atual</p>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Categoria</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>{{ current_user.nome }}</td>
-                <td>{{ current_user.categoria }}</td>
-            </tr>
-        </tbody>
-    </table>
-    <hr>
-
-    <section class="Post">
-        <h2>Post</h2>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#post_modal">
-            Fazer Post
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top mb-4" style="border-bottom: 2px solid #0d6efd;">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-white d-flex align-items-center" href="{{ url_for('Menu') }}">
+            <i class="bi bi-cpu-fill text-primary me-2"></i>DevNetwork
+        </a>
+        <button class="navbar-toggler" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarNav\">
+            <span class=\"navbar-toggler-icon\"></span>
         </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link active fw-semibold" href="{{ url_for('Menu') }}"><i class="bi bi-house-door-fill me-1"></i> Feed</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white-50 fw-semibold" href="{{ url_for('Vagas_Page') }}"><i class="bi bi-briefcase-fill me-1"></i> Vagas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white-50 fw-semibold" href="{{ url_for('Projetos_Page') }}"><i class="bi bi-code-square me-1"></i> Projetos</a>
+                </li>
+                <li class="nav-item ms-lg-3">
+                    <a href="{{ url_for('Perfil_Page') }}" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-bold">
+                        <i class="bi bi-person-circle me-1"></i> {{ current_user.nome }}
+                    </a>
+                </li>
+                <li class="nav-item ms-lg-2">
+                    <a href="{{ url_for('Logout') }}" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">Sair</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
-        <div class="modal fade" id="post_modal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <!-- cabeça modal -->
-                    <div class="modal-header" style="background-color: green;">
-                        <h5 class="modal-title">Faça um Post🔽</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-
-                    <!-- corpo modal -->
-                    <div class="modal-body" style="background-color: antiquewhite;">
-                        <form action="" method="post">
-                            {{ form_post.csrf_token }}
-
-                            {{ form_post.titulo.label(class="form-label small fw-semibold") }}
-                            {{ form_post.titulo(class="form-control") }}
-
-                            {{ form_post.descricao.label(class="form-label small fw-semibold") }}
-                            {{ form_post.descricao(class="form-control") }}
-
-                            {{ form_post.escola.label(class="form-label small fw-semibold") }}
-                            {{ form_post.escola(class="form-control") }}
-
-                            {{ form_post.btn_post(class="btn btn-success mt-4 w-100") }}
-                        </form>
-                    </div>
-                </div>
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 p-4 bg-white mb-4">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-sliders text-primary me-2"></i>Painel Operacional</h5>
+            <p class="text-muted small">Selecione uma ação de cadastro rápido no ecossistema:</p>
+            <div class="d-grid gap-2">
+                <button class="btn btn-outline-primary btn-sm text-start fw-semibold" data-bs-toggle="modal" data-bs-target="#modalPost"><i class="bi bi-plus-circle me-2"></i>Novo Post</button>
+                <button class="btn btn-outline-secondary btn-sm text-start fw-semibold" data-bs-toggle="modal" data-bs-target="#modalEscola"><i class="bi bi-building me-2"></i>Cadastrar Escola</button>
+                <button class="btn btn-outline-secondary btn-sm text-start fw-semibold" data-bs-toggle="modal" data-bs-target="#modalEmpresa"><i class="bi bi-briefcase me-2"></i>Cadastrar Empresa</button>
+                <button class="btn btn-outline-secondary btn-sm text-start fw-semibold" data-bs-toggle="modal" data-bs-target="#modalAluno"><i class="bi bi-person-badge me-2"></i>Cadastrar Aluno</button>
+                <button class="btn btn-outline-secondary btn-sm text-start fw-semibold" data-bs-toggle="modal" data-bs-target="#modalProj"><i class="bi bi-folder-plus me-2"></i>Postar Projeto</button>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- links -->
-    <hr>
-    <section>
-        <h1>Links</h1>
-        {% if current_user.categoria.lower() in ['admin'] %}
-            <button class="btn btn-primary gap-2" data-bs-toggle="modal" data-bs-target="#escola_modal">
-                Cadastrar Escola
-            </button>
-
-            <!-- Modal -->
-            <div class="modal fade" id="escola_modal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                
-                <!-- Cabeçalho -->
-                <div class="modal-header" style="background-color: blue;">
-                    <h5 class="modal-title">Cadastre uma Escola</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                
-                <!-- Corpo -->
-                <div class="modal-body" style="background-color: whitesmoke;">
-                    <!-- formulario da escola -->
-                    <form action="" method="post">
-                        {{ form_escola.csrf_token }}
-                        
-                        {{ form_escola.nome.label(class="form-label small fw-semibold") }}
-                        {{ form_escola.nome(class="form-control")}}
-
-                        {{ form_escola.localizacao.label(class="form-label small fw-semibold") }}
-                        {{ form_escola.localizacao(class="form-control")}}
-
-                        {{ form_escola.contato.label(class="form-label small fw-semibold") }}
-                        {{ form_escola.contato(class="form-control")}}
-
-                        {{ form_escola.btn_escola(class="btn btn-primary mt-4 w-100")}}
-                    </form>
-                </div>
-                
-                <!-- Rodapé -->
-                <div class="modal-footer" style="background-color: black;">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
-                </div>
-
-                </div>
-            </div>
-            </div>
-
-            <!-- Fim modal -->
-
-            <!-- botao 2 -->
-            <button class="btn btn-primary gap-2" data-bs-toggle="modal" data-bs-target="#empresa_modal">
-                Cadastrar Empresa
-            </button>
-
-            <!-- modal -->
-            <div class="modal fade" id="empresa_modal" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <!-- cabeçalho -->
-                        <div class="modal-header" style="background-color: blue;">
-                            <h5>Cadastre uma Empresa</h5>
-                            <button class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-
-                        <!-- corpo -->
-                        <div class="modal-body">
-                            <!-- formulario respectivo -->
-                            <form action="" method="post">
-                                {{ form_empresa.csrf_token }}
-
-                                {{ form_empresa.nome.label(class="form-label small fw-semibold") }}
-                                {{ form_empresa.nome(class="form-control") }}
-
-                                {{ form_empresa.localizacao.label(class="form-label small fw-semibold") }}
-                                {{ form_empresa.localizacao(class="form-control") }}
-
-                                {{ form_empresa.contato.label(class="form-label small fw-semibold") }}
-                                {{ form_empresa.contato(class="form-control") }}
-
-                                {{ form_empresa.btn_empresa(class="btn btn-primary mt-4 w-100")}}
-                            </form> 
-                        </div>
-
-                        <!-- rodapé -->
-                        <div class="modal-footer bg-dark">
-                            <button class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
-                        </div>
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 p-4 bg-white mb-4">
+            <form method="POST" action="">
+                {{ form_post.csrf_token }}
+                <div class="d-flex align-items-start mb-3">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold me-3" style="width: 45px; height: 45px;">
+                        {{ current_user.nome[0] | upper }}
+                    </div>
+                    <div class="flex-grow-1">
+                        {{ form_post.descricao(class="form-control border-0 bg-light", rows="3", style="resize:none;", placeholder="Compartilhe um insight ou código com a comunidade...") }}
                     </div>
                 </div>
-            </div>
+                <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                    <div class="w-50">
+                        {{ form_post.escola(class="form-select form-select-sm border-0 bg-light") }}
+                    </div>
+                    {{ form_post.btn_post(class="btn btn-primary btn-sm fw-bold rounded-pill px-4") }}
+                </div>
+            </form>
+        </div>
 
-            <!-- botao 3 -->
-            <button class="btn btn-primary gap-2" data-bs-toggle="modal" data-bs-target="#aluno_modal">
-                Cadastrar Aluno
-            </button>
-
-            <!-- modal -->
-            <div class="modal fade" id="aluno_modal" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <!-- cabeçalho -->
-                        <div class="modal-header" style="background-color: blue;">
-                            <h5>Cadastre um Aluno</h5>
-                            <button class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-
-                        <!-- corpo -->
-                        <div class="modal-body">
-                            <form action="" method="post">
-                                <!-- formulario respectivo -->
-                                {{ form_aluno.csrf_token }}
-
-                                {{ form_aluno.nome.label(class="form-label small fw-semibold") }}
-                                {{ form_aluno.nome(class="form-control")}}
-
-                                {{ form_aluno.escola.label(class="form-label small fw-semibold") }}
-                                {{ form_aluno.escola(class="form-control")}}
-
-                                {{ form_aluno.turma.label(class="form-label small fw-semibold") }}
-                                {{ form_aluno.turma(class="form-control")}}
-
-                                {{ form_aluno.contato.label(class="form-label small fw-semibold") }}
-                                {{ form_aluno.contato(class="form-control")}}
-
-                                {{ form_aluno.email.label(class="form-label small fw-semibold") }}
-                                {{ form_aluno.email(class="form-control")}}
-
-                                {{ form_aluno.senha.label(class="form-label small fw-semibold") }}
-                                {{ form_aluno.senha(class="form-control")}}
-
-                                {{ form_aluno.btn_aluno(class="btn btn-primary mt-4 w-100")}}
-                            </form>
-                        </div>
-
-                        <!-- rodapé -->
-                        <div class="modal-footer bg-dark">
-                            <button class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+        {% if posts %}
+            {% for post in posts %}
+                <div class="card shadow-sm border-0 p-4 bg-white mb-3">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed={{ current_user.nome }}" class="rounded-circle bg-light border me-2" style="width: 45px; height: 45px;">
+                        <div>
+                            <h6 class="mb-0 fw-bold text-dark">Usuário #{{ post.id_usuario }}</h6>
+                            <small class="text-muted small">Postado em DevNetwork</small>
                         </div>
                     </div>
+                    <p class="text-secondary text-start" style="white-space: pre-line;">{{ post.descricao }}</p>
                 </div>
+            {% endfor %}
+        {% else %}
+            <div class="card p-5 text-center border-0 bg-white shadow-sm">
+                <i class="bi bi-chat-square-dots text-muted display-4 mb-3"></i>
+                <h5 class="fw-bold text-dark">Nenhuma publicação ainda</h5>
+                <p class="text-muted small mb-0">Seja o primeiro a compartilhar um conteúdo com a rede!</p>
             </div>
-            
-
-            <!-- botao 4 -->
-            <button class="btn btn-primary gap-2" data-bs-toggle="modal" data-bs-target="#funcionario_escola_modal">
-                Cadastrar Funcionario/Escola
-            </button>
-
-            <!-- modal -->
-            <div class="modal fade" id="funcionario_escola_modal" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <!-- cabeçalho -->
-                        <div class="modal-header" style="background-color: blue;">
-                            <h5>Cadastre um Funcionario/Escola</h5>
-                            <button class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-
-                        <!-- corpo -->
-                        <div class="modal-body">
-                            <!-- formulario respectivo -->
-                            <form action="" method="post">
-                                {{ form_funcionario_escola.csrf_token }}
-
-                                {{ form_funcionario_escola.nome.label(class="form-label small fw-semibold") }}
-                                {{ form_funcionario_escola.nome(class="form-control") }}
-
-                                {{ form_funcionario_escola.cargo.label(class="form-label small fw-semibold") }}
-                                {{ form_funcionario_escola.cargo(class="form-control") }}
-
-                                {{ form_funcionario_escola.escola.label(class="form-label small fw-semibold") }}
-                                {{ form_funcionario_escola.escola(class="form-control") }}
-
-                                {{ form_funcionario_escola.contato.label(class="form-label small fw-semibold") }}
-                                {{ form_funcionario_escola.contato(class="form-control") }}
-
-                                {{ form_funcionario_escola.email.label(class="form-label small fw-semibold") }}
-                                {{ form_funcionario_escola.email(class="form-control") }}
-
-                                {{ form_funcionario_escola.senha.label(class="form-label small fw-semibold") }}
-                                {{ form_funcionario_escola.senha(class="form-control") }}
-
-                                {{ form_funcionario_escola.btn_funcionario_escola(class="btn btn-primary w-100 mt-4") }}
-                            </form>
-                        </div>
-
-                        <!-- rodapé -->
-                        <div class="modal-footer bg-dark">
-                            <button class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- botao 5 -->
-            <button class="btn btn-primary gap-2" data-bs-toggle="modal" data-bs-target="#funcionario_empresa_modal">
-                Cadastrar Funcionario/Empresa
-            </button>
-
-            <!-- modal -->
-            <div class="modal fade" id="funcionario_empresa_modal" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <!-- cabeçalho -->
-                        <div class="modal-header" style="background-color: blue;">
-                            <h5>Cadastre um Funcionario/Empresa</h5>
-                            <button class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-
-                        <!-- corpo -->
-                        <div class="modal-body">
-                            <!-- formulario respectivo -->
-                            <form action="" method="post">
-                                {{ form_funcionario_empresa.csrf_token }}
-
-                                {{ form_funcionario_empresa.nome.label(class="form-label small fw-semibold")}}
-                                {{ form_funcionario_empresa.nome(class="form-control")}}
-
-                                {{ form_funcionario_empresa.cargo.label(class="form-label small fw-semibold")}}
-                                {{ form_funcionario_empresa.cargo(class="form-control")}}
-                                
-                                {{ form_funcionario_empresa.empresa.label(class="form-label small fw-semibold")}}
-                                {{ form_funcionario_empresa.empresa(class="form-control")}}
-
-                                {{ form_funcionario_empresa.contato.label(class="form-label small fw-semibold")}}
-                                {{ form_funcionario_empresa.contato(class="form-control")}}
-
-                                {{ form_funcionario_empresa.email.label(class="form-label small fw-semibold")}}
-                                {{ form_funcionario_empresa.email(class="form-control")}}
-
-                                {{ form_funcionario_empresa.senha.label(class="form-label small fw-semibold")}}
-                                {{ form_funcionario_empresa.senha(class="form-control")}}
-
-                                {{ form_funcionario_empresa.btn_funcionario_empresa(class="btn btn-primary mt-4 w-100")}}
-                            </form>
-                        </div>
-
-                        <!-- rodapé -->
-                        <div class="modal-footer bg-dark">
-                            <button class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-
-        {% elif current_user.categoria.lower() in ['escola'] %}
-            <button class="btn btn-primary gap-2">Cadastrar Aluno</button>
-            <button class="btn btn-primary gap-2">Cadastrar Funcionario/Escola</button>
-        {% elif current_user.categoria.lower() in ['empresa'] %}
-            <button class="btn btn-primary gap-2">Cadastrar Funcionario/Empresa</button>
         {% endif %}
-        
-        <a href="{{ url_for('Vagas_Page') }}">Vagas</a>
-        <a href="{{ url_for('Projetos_Page') }}">Projetos</a>
-        <a href="{{ url_for('Perfil_Page') }}">Perfil</a>
-    </section>
-    
-    <hr>
-    
-    <section>
-        <h1>Post Gerados</h1>
-        {% for post in posts %}
-            <div class="card p-0 mt-2" style="width: 20rem;">
+    </div>
+</div>
 
-                <div class="card-body">
-                    <div class="card-header bg-success">
-                        <h5 class="card-title">{{ post.titulo }}</h5>
-                    </div>
-
-                    <hr>
-
-                    <textarea name="" id="" style="width: 18.5rem;" readonly >
-                        {{ post.descricao }}
-                    </textarea>
-
-                    <hr>
-
-                    <p>Dono do post🔽</p>
-                    <span class="fs-3">{{ post.post_escola.nome }}</span>
-                </div>
+<div class="modal fade" id="modalProj" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold"><i class="bi bi-folder-plus me-2"></i>Postar Novo Projeto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
-            <hr>
-        {% endfor %}
-    </section>
-
-    <section>
-        <h1>Vagas postadas</h1>
-        {% for vaga in vagas_postadas %}
-            <div class="card p-0 mt-2" style="width: 20rem;">
-
-                <div class="card-body">
-                    <div class="card-header bg-success">
-                        <h5 class="card-title">{{ vaga.titulo }}</h5>
+            <form method="POST" action="" enctype="multipart/form-data">
+                {{ form_projetos.csrf_token }}
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        {{ form_projetos.titulo.label(class="form-label fw-semibold small text-secondary") }}
+                        {{ form_projetos.titulo(class="form-control", placeholder="Nome do sistema ou repositório") }}
                     </div>
-
-                    <hr>
-
-                    <textarea name="" id="" style="width: 18.5rem;" readonly >
-                        {{ vaga.descricao }}
-                    </textarea>
-
-                    <hr>
-
-                    <p>Dono do post🔽</p>
-                    <span class="fs-3">{{ vaga.empresa_vagas.nome }}</span>
-
-                    <hr>
-
-                    {% if current_user.categoria.lower() == 'aluno' %}
-                        <button>Se Candidatar</button>
-                    {% elif current_user.categoria.lower() == 'funcionario' %}
-                        <button>Indicar</button>
-                    {% endif %}
-
-                    {% if current_user.categoria.lower() == 'admin' %}
-                        <!-- trigger -->
-                        <button class="btn btn-primary" tabindex="-1" data-bs-toggle="modal" data-bs-target="#indicacao_modal">
-                            Indicar/candidatar-se
-                        </button>
-
-                        <!-- modal -->
-                        <div class="modal fade" id="indicacao_modal">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <!-- cabeçalho -->
-                                    <div class="modal-header bg-primary">
-                                        <h5>Indicando Alguem</h5>
-                                        <button class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-
-                                    <!-- corpo -->
-                                    <div class="modal-body">
-                                        <!-- formulario respectivo -->
-                                        <form action="" method="post">
-                                            {{ form_indicacao.csrf_token }}
-
-                                            {{ form_indicacao.escola.label(class="form-label small fw-semibold") }}
-                                            {{ form_indicacao.escola(class="form-control")}}
-
-                                            {{ form_indicacao.status.label(class="form-label small fw-semibold") }}
-                                            {{ form_indicacao.status(class="form-control")}}
-
-                                            {{ form_indicacao.indicado.label(class="form-label small fw-semibold") }}
-                                            {{ form_indicacao.indicado(class="form-control")}}
-
-                                            {{ form_indicacao.vaga.label(class="form-label small fw-semibold") }}
-                                            {{ form_indicacao.vaga(class="form-control")}}
-
-                                            {{ form_indicacao.btn_indicacao(class="btn btn-primary w-100 mt-4")}}
-
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="mb-3">
+                        {{ form_projetos.descricao.label(class="form-label fw-semibold small text-secondary") }}
+                        {{ form_projetos.descricao(class="form-control", rows="3", placeholder="O que seu projeto faz?") }}
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            {{ form_projetos.escola.label(class="form-label fw-semibold small text-secondary") }}
+                            {{ form_projetos.escola(class="form-select") }}
                         </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <hr>
-        {% endfor %}
-        
-        <!-- trigger -->
-        <button type="button" class="btn btn-primary fs-5" data-bs-toggle="modal" data-bs-target="#vagas_modal">
-            Postar Vaga
-        </button>
-
-        <!-- modal -->
-        <div class="modal fade" id="vagas_modal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <!-- cabeçalho -->
-                    <div class="modal-header bg-primary">
-                        <h5 class="modal-title">Postando uma vaga</h5>
-                        <button class="btn-close" data-bs-dismiss="modal"></button> 
                     </div>
-
-                    <!-- corpo -->
-                    <div class="modal-body">
-                        <!-- formulario respectivo -->
-                        <form action="" method="post">
-                            {{ form_vagas.csrf_token }}
-
-                            {{ form_vagas.titulo.label(class="form-label small fw-semibold") }}
-                            {{ form_vagas.titulo(class="form-control")}}
-
-                            {{ form_vagas.descricao.label(class="form-label small fw-semibold") }}
-                            {{ form_vagas.descricao(class="form-control")}}
-
-                            {{ form_vagas.empresa.label(class="form-label small fw-semibold") }}
-                            {{ form_vagas.empresa(class="form-control")}}
-
-                            {{ form_vagas.btn_vaga(class="btn btn-primary mt-4 w-100")}}
-                        </form>
-                    </div>
-
-                    <div class="modal-footer bg-dark">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
+                    <div class="mb-3">
+                        {{ form_projetos.imagem.label(class="form-label fw-semibold small text-secondary") }}
+                        {{ form_projetos.imagem(class="form-control") }}
                     </div>
                 </div>
-            </div>
+                <div class="modal-footer bg-white border-0">
+                    <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Cancelar</button>
+                    {{ form_projetos.btn_projetos(class="btn btn-primary btn-sm fw-bold rounded-pill px-4") }}
+                </div>
+            </form>
         </div>
-    </section>
-    
-    <hr>
-
-    <section>
-        <h1>Alunos cadastrados</h1>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Turma</th>
-                    <th>Escola</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for aluno in alunos %}
-                    <tr>
-                        <td>{{ aluno.nome }}</td>
-                        <td>{{ aluno.turma }}</td>
-                        <td>{{ aluno.aluno_escola.nome }}</td>
-                    </tr>
-                {% endfor %}
-                
-            </tbody>
-        </table>
-    </section>
-
-    <hr>
-
-    <section>
-        <h1>Empresas Cadastradas</h1>
-        {% for empresa in empresas %}
-            <span class="fs-5 fw-bold">Nome Empresa: </span> {{ empresa.nome }} <br>
-        {% endfor %}
-    </section>
-    
-    <hr>
-
-    <section>
-        <h1>Escolas cadastradas</h1>
-        {% for escola in escolas %}
-            <span class="fs-5 fw-bold">Nome Empresa: </span> {{ escola.nome }} <br>
-        {% endfor %}
-    </section>
-
-    <hr>
-
-    <section>
-        <h1>Funcionarios/Escola Cadastrados</h1>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Cargo</th>
-                    <th>Escola</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for funcionario in funcionarios_escola %}
-                    <tr>
-                        <td>{{ funcionario.nome}}</td>
-                        <td>{{ funcionario.cargo}}</td>
-                        <td>{{ funcionario.funcionario_escola.nome}}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
-
-    <hr>
-
-    <section>
-        <h1>Funcionarios/Empresa Cadastrados</h1>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Nome</th>
-                    <th>Nome</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    {% for funcionario in funcionarios_empresa %}
-                        <td>{{ funcionario.nome }}</td>
-                        <td>{{ funcionario.cargo }}</td>
-                        <td>{{ funcionario.empresa_funcionario.nome }}</td>
-                    {% endfor %}
-                </tr>
-            </tbody>
-        </table>
-    </section>
-
-    <hr>
-
-    <section>
-        <h1>Alunos inscritos:</h1>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Escola</th>
-                    <th>Vaga</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for inscrito in inscritos %}
-                    <tr>
-                        <td>{{ inscrito.rel_aluno.nome }}</td>
-                        <td>{{ inscrito.rel_escola.nome }}</td>
-                        <td>{{ inscrito.rel_vaga.titulo }}</td>
-                        <td>{{ inscrito.status }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <hr>
-
-        <h1>Alunos Indicados:</h1>
-        <table class="table">
-            <thead>
-                <th>Nome</th>
-                <th>Escola</th>
-                <th>Vaga</th>
-                <th>Status</th>
-            </thead>
-
-            <tbody>
-                {% for indicado in indicados %}
-                    <tr>
-                        <td>{{ indicado.rel_aluno.nome }}</td>
-                        <td>{{ indicado.rel_escola.nome }}</td>
-                        <td>{{ indicado.rel_vaga.titulo }}</td>
-                        <td>{{ indicado.status }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
-
-    <hr>
-
-    <section>
-        <h1>Projetos registrados</h1>
-        <button type="button" class="btn btn-primary fs-4" data-bs-toggle="modal" data-bs-target="#projetos_modal">
-            Registar Projeto
-        </button>
-
-        <div class="modal fade" id="projetos_modal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <!-- cabeçalho -->
-                    <div class="modal-header bg-primary">
-                        <h5 class="modal-title">Registrando um Projeto</h5>
-                        <button class="btn-close" data-bs-dismiss="modal"></button> 
-                    </div>
-
-                    <!-- corpo -->
-                    <div class="modal-body">
-                        <!-- Conteúdo do modal -->
-                        <form action="" method="post" enctype="multipart/form-data">
-
-                            {{ form_projetos.csrf_token }}
-
-                            {{ form_projetos.titulo.label(class="form-label") }}
-                            {{ form_projetos.titulo(class="form-control") }}
-
-                            {{ form_projetos.descricao.label(class="form-label") }}
-                            {{ form_projetos.descricao(class="form-control") }}
-
-                            {{ form_projetos.imagem.label(class="form-label") }}
-                            {{ form_projetos.imagem(class="form-control") }}
-
-                            {{ form_projetos.escola.label(class="form-label") }}
-                            {{ form_projetos.escola(class="form-control") }}
-
-                            {{ form_projetos.btn_projetos(class="btn btn-primary mt-4 w-100") }}
-
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <h1>Projetos Postados</h1>
-        {% for projeto in projetos %}
-            <hr>
-            <div class="card p-0 mt-3 border shadow-sm" style="width: 20rem;">
-        
-            <!-- Cabeçalho do Card -->
-            <div class="card-header bg-success text-white">
-                <h5 class="card-title mb-0 text-center">{{ projeto.titulo }}</h5>
-            </div>
-
-            <div class="card-body text-center">
-                <!-- Espaço da Imagem Isolado e Protegido -->
-                <div class="mb-3 border rounded bg-light d-flex align-items-center justify-content-center" style="height: 200px; overflow: hidden;">
-                    <img src="{{ url_for('static', filename='data/projetos/' + projeto.imagem) }}" 
-                        class="img-fluid" 
-                        style="max-width: 100%; max-height: 100%; object-fit: contain;"
-                        alt="Imagem do Projeto">
-                </div>
-
-                <hr>
-
-                <!-- Campo de Descrição Ajustado -->
-                <div class="mb-3">
-                    <textarea class="form-control" style="width: 100%; resize: none;" rows="3" readonly>{{ projeto.descricao }}</textarea>
-                </div>
-
-                <hr>
-
-                <p class="mb-1 text-muted small">Dono do post 🔽</p>
-                <span class="fs-4 fw-bold text-dark d-block">{{ projeto.projeto_escola.nome }}</span>
-            </div>
-
-        {% endfor %}
-    </section>
+    </div>
+</div>
 {% endblock %}
-
-<!-- 
-        os usuarios
-1 -> fer@gmail.com: aluno
-2 -> marechal.rondon@gmail.com: escola
-3 -> gabriel@gmail.com: admin
--->
