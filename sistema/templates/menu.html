@@ -56,7 +56,7 @@
                             {{ form_post.escola.label(class="form-label small fw-semibold") }}
                             {{ form_post.escola(class="form-control") }}
 
-                            {{ form_post.btnsubmit(class="btn btn-success mt-4 w-100") }}
+                            {{ form_post.btn_post(class="btn btn-success mt-4 w-100") }}
                         </form>
                     </div>
                 </div>
@@ -195,7 +195,7 @@
                                 {{ form_aluno.senha.label(class="form-label small fw-semibold") }}
                                 {{ form_aluno.senha(class="form-control")}}
 
-                                {{ form_aluno.btnsubmit(class="btn btn-primary mt-4 w-100")}}
+                                {{ form_aluno.btn_aluno(class="btn btn-primary mt-4 w-100")}}
                             </form>
                         </div>
 
@@ -655,32 +655,39 @@
             </div>
         </div>
 
-        <hr>
 
         <h1>Projetos Postados</h1>
         {% for projeto in projetos %}
-            <div class="card p-0 mt-2" style="width: 20rem;">
-
-                <div class="card-body">
-                    <div class="card-header bg-success">
-                        <h5 class="card-title">{{ projeto.titulo }}</h5>
-                    </div>
-
-                    <hr>
-                    <img src="{{ url_for('static', filename='data/projetos/' + projeto.imagem) }}" style="max-width: 300px;">
-
-                    <textarea name="" id="" style="width: 18.5rem;" readonly >
-                        {{ projeto.descricao }}
-                    </textarea>
-
-                    <hr>
-
-                    <p>Dono do post🔽</p>
-                    <span class="fs-3">{{ projeto.projeto_escola.nome }}</span>
-                </div>
+            <hr>
+            <div class="card p-0 mt-3 border shadow-sm" style="width: 20rem;">
+        
+            <!-- Cabeçalho do Card -->
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0 text-center">{{ projeto.titulo }}</h5>
             </div>
 
-            <hr>
+            <div class="card-body text-center">
+                <!-- Espaço da Imagem Isolado e Protegido -->
+                <div class="mb-3 border rounded bg-light d-flex align-items-center justify-content-center" style="height: 200px; overflow: hidden;">
+                    <img src="{{ url_for('static', filename='data/projetos/' + projeto.imagem) }}" 
+                        class="img-fluid" 
+                        style="max-width: 100%; max-height: 100%; object-fit: contain;"
+                        alt="Imagem do Projeto">
+                </div>
+
+                <hr>
+
+                <!-- Campo de Descrição Ajustado -->
+                <div class="mb-3">
+                    <textarea class="form-control" style="width: 100%; resize: none;" rows="3" readonly>{{ projeto.descricao }}</textarea>
+                </div>
+
+                <hr>
+
+                <p class="mb-1 text-muted small">Dono do post 🔽</p>
+                <span class="fs-4 fw-bold text-dark d-block">{{ projeto.projeto_escola.nome }}</span>
+            </div>
+
         {% endfor %}
     </section>
 {% endblock %}

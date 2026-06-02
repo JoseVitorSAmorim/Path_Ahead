@@ -1,6 +1,9 @@
 # importando a classe do pacote
 from flask_wtf import FlaskForm
 
+# importando o current app para pegar a pasta raiz
+from flask import current_app
+
 # importando o tipo de campo e os validators
 from wtforms import StringField, EmailField, PasswordField, SubmitField, PasswordField, IntegerField, SelectField, TextAreaField
 
@@ -112,7 +115,7 @@ class AlunoForm(FlaskForm):
     senha = PasswordField('Senha', validators=[DataRequired()])
     contato = TextAreaField('Contato(s)', validators=[DataRequired()])
     escola = SelectField('Colegio', coerce=int, validators=[DataRequired()])
-    btnsubmit = SubmitField('Cadastrar')
+    btn_aluno = SubmitField('Cadastrar')
 
     # criando o validador
     def validate_email(self, email):
@@ -166,16 +169,12 @@ class FuncionarioEscolaForm(FlaskForm):
         db.session.add(funcionario)
         db.session.commit()
 
-# formulario de projetos
-class ProjetosForm(FlaskForm):
-    pass
-
 # formulario de post
 class PostForm(FlaskForm):
     titulo = StringField('Titulo', validators=[DataRequired()])
     descricao = TextAreaField('Descrição', validators=[DataRequired()])
     escola = SelectField('Selecione a Escola', coerce=int, validators=[DataRequired()])
-    btnsubmit = SubmitField('Postar')
+    btn_post = SubmitField('Postar')
     
     def save(self):
         post = Post(
@@ -235,6 +234,7 @@ class FuncionarioEmpresaForm(FlaskForm):
 
         db.session.add(funcionario)
         db.session.commit()
+
 # formulario de vagas
 class VagasForm(FlaskForm):
    titulo = StringField('Titulo da Vaga', validators=[DataRequired()])
@@ -282,24 +282,43 @@ class IndicacaoForm(FlaskForm):
 class ProjetosForm(FlaskForm):
     titulo = StringField('Titulo do Projeto', validators=[DataRequired()])
     descricao = TextAreaField('Descrição do Projeto', validators=[DataRequired()])
-    imagem = FileField('Imagem do Projeto', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Apenas imagens são permitidas!'), FileRequired()])
+    imagem = FileField('Imagem do Projeto', validators=[FileRequired('A imagem é obrigatória!'), FileAllowed(['jpg', 'png', 'jpeg'], 'Apenas imagens são permitidas!')])
     escola = SelectField('Escola', coerce=int, validators=[DataRequired()])
     btn_projetos = SubmitField('Salvar')
 
     def save(self):
         imagem = self.imagem.data
-
         nome_seguro = secure_filename(imagem.filename)
 
+        # USANDO O RECURSO NATIVO DO FLASK:
+        # app.root_path aponta direto para a pasta interna do seu app (onde fica a pasta 'static')
+        # Se a sua pasta 'static' estiver na raiz do projeto, usamos os.path.dirname(app.root_path)
+        
+        # Vamos criar um print temporário para você ver no terminal onde ele está salvando
+        caminho_base = app.root_path
+        if not os.path.exists(os.path.join(caminho_base, 'static')):
+            caminho_base = os.path.dirname(app.root_path)
+
         caminho_completo = os.path.join(
-            os.path.abspath(os.path.dirname(__file__)),
-            app.config['UPLOAD_FILES'],
+            caminho_base,
+            'static',
+            'data',
             'projetos',
             nome_seguro
         )
 
+        # Imprime no terminal do VS Code o local exato onde o Python vai gravar o arquivo
+        print("====== CAMINHO REAL DE SALVAMENTO ======")
+        print(caminho_completo)
+        print("========================================")
+
+        # Garante a criação física dos diretórios no Windows
+        os.makedirs(os.path.dirname(caminho_completo), exist_ok=True)
+
+        # Salva o arquivo físico no lugar correto
         imagem.save(caminho_completo)
 
+        # Salva no Banco de Dados
         projeto = Projetos(
             titulo=self.titulo.data,
             descricao=self.descricao.data,

@@ -88,17 +88,21 @@ def Menu():
 
     # buscando os alunos indicados
     inscritos = Indicacao.query.filter(Indicacao.status == 'Candidatar-se').all()
-
     print('INSCRITOS', inscritos)
     
     # buscando os alunos inscritos
     indicados = Indicacao.query.filter(Indicacao.status == 'Indicar').all()
+    print('INDICADOS', indicados)
 
     # buscando todos os projetos
     projetos = Projetos.query.all()
     print('PROJETOS', projetos)
 
-    print('INDICADOS', indicados)
+
+    # buscando todos os projetos
+    projetos = Projetos.query.all()
+    print('PROJETOS', projetos)
+
     # abastecendo o choices do select field
     form_post.escola.choices = [(escola.id, escola.nome) for escola in escolas]
 
@@ -126,7 +130,7 @@ def Menu():
     # abastecendo o form projetos label escola
     form_projetos.escola.choices = [(escola.id, escola.nome) for escola in escolas]
 
-    if form_post.validate_on_submit():
+    if form_post.validate_on_submit() and form_post.btn_post.data:
         form_post.save()
         print('post criado com sucesso')
         return redirect(url_for('Menu'))
@@ -136,7 +140,7 @@ def Menu():
         print('Escola cadastrada com sucesso')
         return redirect(url_for('Menu'))
 
-    elif form_aluno.validate_on_submit():
+    if form_aluno.validate_on_submit() and form_aluno.btn_aluno.data:
         form_aluno.save()
         print('Aluno criado com sucesso')
         return redirect(url_for('Menu'))
@@ -175,7 +179,7 @@ def Menu():
         form_projetos.save()
         print('Projeto Postado com sucesso')
         return redirect(url_for('Menu'))
-    
+        
     return render_template(
         'menu.html', 
         form_post = form_post, 
