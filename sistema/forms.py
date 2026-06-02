@@ -5,7 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, EmailField, PasswordField, SubmitField, PasswordField, IntegerField, SelectField, TextAreaField
 
 # importando os campos de arquivo
-from flask_wtf.file import FileField, FileAllowed
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 # importando os validators
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
@@ -276,4 +276,36 @@ class IndicacaoForm(FlaskForm):
         )
 
         db.session.add(indicacao)
+        db.session.commit()
+
+# formulario de projetos
+class ProjetosForm(FlaskForm):
+    titulo = StringField('Titulo do Projeto', validators=[DataRequired()])
+    descricao = TextAreaField('Descrição do Projeto', validators=[DataRequired()])
+    imagem = FileField('Imagem do Projeto', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Apenas imagens são permitidas!'), FileRequired()])
+    escola = SelectField('Escola', coerce=int, validators=[DataRequired()])
+    btn_projetos = SubmitField('Salvar')
+
+    def save(self):
+        imagem = self.imagem.data
+
+        nome_seguro = secure_filename(imagem.filename)
+
+        caminho_completo = os.path.join(
+            os.path.abspath(os.path.dirname(__file__)),
+            app.config['UPLOAD_FILES'],
+            'projetos',
+            nome_seguro
+        )
+
+        imagem.save(caminho_completo)
+
+        projeto = Projetos(
+            titulo=self.titulo.data,
+            descricao=self.descricao.data,
+            id_escola=self.escola.data,
+            imagem=nome_seguro
+        )
+        
+        db.session.add(projeto)
         db.session.commit()

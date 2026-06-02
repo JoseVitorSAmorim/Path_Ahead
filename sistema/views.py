@@ -63,6 +63,7 @@ def Menu():
     form_funcionario_empresa = FuncionarioEmpresaForm()
     form_vagas = VagasForm()
     form_indicacao = IndicacaoForm()
+    form_projetos = ProjetosForm()
 
     # buscando os post
     posts = Post.query.all()
@@ -89,8 +90,13 @@ def Menu():
     inscritos = Indicacao.query.filter(Indicacao.status == 'Candidatar-se').all()
 
     print('INSCRITOS', inscritos)
+    
     # buscando os alunos inscritos
     indicados = Indicacao.query.filter(Indicacao.status == 'Indicar').all()
+
+    # buscando todos os projetos
+    projetos = Projetos.query.all()
+    print('PROJETOS', projetos)
 
     print('INDICADOS', indicados)
     # abastecendo o choices do select field
@@ -116,6 +122,9 @@ def Menu():
 
     # abastecendo o form indicacao label escola
     form_indicacao.escola.choices = [(escola.id, escola.nome) for escola in escolas]
+
+    # abastecendo o form projetos label escola
+    form_projetos.escola.choices = [(escola.id, escola.nome) for escola in escolas]
 
     if form_post.validate_on_submit():
         form_post.save()
@@ -162,6 +171,11 @@ def Menu():
         print('Aluno inscrito com sucesso')
         return redirect(url_for('Menu'))
     
+    if form_projetos.validate_on_submit() and form_projetos.btn_projetos.data:
+        form_projetos.save()
+        print('Projeto Postado com sucesso')
+        return redirect(url_for('Menu'))
+    
     return render_template(
         'menu.html', 
         form_post = form_post, 
@@ -180,7 +194,9 @@ def Menu():
         vagas_postadas = vagas_postadas,
         form_indicacao = form_indicacao,
         indicados = indicados,
-        inscritos = inscritos
+        inscritos = inscritos,
+        form_projetos = form_projetos,
+        projetos = projetos
         )
 
 # criando a rota vagas

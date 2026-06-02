@@ -610,6 +610,79 @@
             </tbody>
         </table>
     </section>
+
+    <hr>
+
+    <section>
+        <h1>Projetos registrados</h1>
+        <button type="button" class="btn btn-primary fs-4" data-bs-toggle="modal" data-bs-target="#projetos_modal">
+            Registar Projeto
+        </button>
+
+        <div class="modal fade" id="projetos_modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <!-- cabeçalho -->
+                    <div class="modal-header bg-primary">
+                        <h5 class="modal-title">Registrando um Projeto</h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button> 
+                    </div>
+
+                    <!-- corpo -->
+                    <div class="modal-body">
+                        <!-- Conteúdo do modal -->
+                        <form action="" method="post" enctype="multipart/form-data">
+
+                            {{ form_projetos.csrf_token }}
+
+                            {{ form_projetos.titulo.label(class="form-label") }}
+                            {{ form_projetos.titulo(class="form-control") }}
+
+                            {{ form_projetos.descricao.label(class="form-label") }}
+                            {{ form_projetos.descricao(class="form-control") }}
+
+                            {{ form_projetos.imagem.label(class="form-label") }}
+                            {{ form_projetos.imagem(class="form-control") }}
+
+                            {{ form_projetos.escola.label(class="form-label") }}
+                            {{ form_projetos.escola(class="form-control") }}
+
+                            {{ form_projetos.btn_projetos(class="btn btn-primary mt-4 w-100") }}
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <h1>Projetos Postados</h1>
+        {% for projeto in projetos %}
+            <div class="card p-0 mt-2" style="width: 20rem;">
+
+                <div class="card-body">
+                    <div class="card-header bg-success">
+                        <h5 class="card-title">{{ projeto.titulo }}</h5>
+                    </div>
+
+                    <hr>
+                    <img src="{{ url_for('static', filename='data/projetos/' + projeto.imagem) }}" style="max-width: 300px;">
+
+                    <textarea name="" id="" style="width: 18.5rem;" readonly >
+                        {{ projeto.descricao }}
+                    </textarea>
+
+                    <hr>
+
+                    <p>Dono do post🔽</p>
+                    <span class="fs-3">{{ projeto.projeto_escola.nome }}</span>
+                </div>
+            </div>
+
+            <hr>
+        {% endfor %}
+    </section>
 {% endblock %}
 
 <!-- 

@@ -58,7 +58,7 @@ bcrypt = Bcrypt()
 login_manager.login_view = 'login' # alterar para pagina onde vai ter o login
 
 # configurando para receber os uploads
-app.config['UPLOAD_FILE'] = r"static/data"
+app.config['UPLOAD_FILES'] = r"static/data"
 
 # caso der erro de url importar a rota
 from sistema.views import Menu # importar no final para nao gerar erro
