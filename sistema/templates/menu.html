@@ -41,10 +41,143 @@
             <h5 class="fw-bold text-dark mb-3"><i class="bi bi-sliders text-primary me-2"></i>Painel Operacional</h5>
             <p class="text-muted small">Selecione uma ação de cadastro rápido no ecossistema:</p>
             <div class="d-grid gap-2">
-                <button class="btn btn-outline-primary btn-sm text-start fw-semibold" data-bs-toggle="modal" data-bs-target="#modalPost"><i class="bi bi-plus-circle me-2"></i>Novo Post</button>
+                <!-- 1 -->
+                <button class="btn btn-outline-primary btn-sm text-start fw-semibold" data-bs-toggle="modal" data-bs-target="#modalPost"><i class="bi bi-plus-circle me-2"></i>Novo Post</button> 
+
+                <div class="modal fade mt-4" id="modalPost" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary">
+                                <h5 class="modal-title">Novo Post</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form action="" method="post">
+                                <div class="modal-body">
+                                    {{ form_post.csrf_token }}
+
+                                    {{ form_post.titulo.label() }}
+                                    {{ form_post.titulo(class="form-control") }}
+
+                                    {{ form_post.descricao.label() }}
+                                    {{ form_post.descricao(class="form-control") }}
+
+                                    {{ form_post.escola.label() }}
+                                    {{ form_post.escola(class="form-control") }}
+                                </div>
+
+                                <div class="modal-footer">
+                                    {{ form_post.btn_post(class="btn btn-success") }}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2 -->
                 <button class="btn btn-outline-secondary btn-sm text-start fw-semibold" data-bs-toggle="modal" data-bs-target="#modalEscola"><i class="bi bi-building me-2"></i>Cadastrar Escola</button>
+
+                <div class="modal fade mt-4" id="modalEscola" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary">
+                                <h5 class="modal-title">Cadastrar Escola</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form action="" method="post">
+                                <div class="modal-body">
+                                    {{ form_escola.csrf_token }}
+
+                                    {{ form_escola.nome.label() }}
+                                    {{ form_escola.nome(class="form-control") }}
+
+                                    {{ form_escola.localizacao.label() }}
+                                    {{ form_escola.localizacao(class="form-control") }}
+
+                                    {{ form_escola.contato.label() }}
+                                    {{ form_escola.contato(class="form-control") }}
+                                </div>
+
+                                <div class="modal-footer">
+                                    {{ form_escola.btn_escola(class="btn btn-success") }}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3 -->
                 <button class="btn btn-outline-secondary btn-sm text-start fw-semibold" data-bs-toggle="modal" data-bs-target="#modalEmpresa"><i class="bi bi-briefcase me-2"></i>Cadastrar Empresa</button>
+                
+                <div class="modal fade mt-4" id="modalEmpresa" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary">
+                                <h5 class="modal-title">Cadastrar Empresa</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form action="" method="post">
+                                <div class="modal-body">
+                                    {{ form_empresa.csrf_token }}
+
+                                    {{ form_empresa.nome.label() }}
+                                    {{ form_empresa.nome(class="form-control") }}
+
+                                    {{ form_empresa.localizacao.label() }}
+                                    {{ form_empresa.localizacao(class="form-control") }}
+
+                                    {{ form_empresa.contato.label() }}
+                                    {{ form_empresa.contato(class="form-control") }}
+                                </div>
+
+                                <div class="modal-footer">
+                                    {{ form_empresa.btn_empresa(class="btn btn-success") }}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4 -->
                 <button class="btn btn-outline-secondary btn-sm text-start fw-semibold" data-bs-toggle="modal" data-bs-target="#modalAluno"><i class="bi bi-person-badge me-2"></i>Cadastrar Aluno</button>
+                
+                <div class="modal fade mt-4" id="modalAluno" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary">
+                                <h5 class="modal-title">Cadastrar Aluno</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form action="" method="post">
+                                <div class="modal-body">
+                                    {{ form_aluno.csrf_token }}
+
+                                    {{ form_aluno.nome.label() }}
+                                    {{ form_aluno.nome(class="form-control") }}
+
+                                    {{ form_aluno.turma.label() }}
+                                    {{ form_aluno.turma(class="form-control") }}
+
+                                    {{ form_aluno.email.label() }}
+                                    {{ form_aluno.email(class="form-control") }}
+
+                                    {{ form_aluno.senha.label() }}
+                                    {{ form_aluno.senha(class="form-control") }}
+
+                                    {{ form_aluno.contato.label() }}
+                                    {{ form_aluno.contato(class="form-control") }}
+
+                                    {{ form_aluno.escola.label() }}
+                                    {{ form_aluno.escola(class="form-control") }}
+                                </div>
+
+                                <div class="modal-footer">
+                                    {{ form_aluno.btn_aluno(class="btn btn-success") }}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- 5 -->
                 <button class="btn btn-outline-secondary btn-sm text-start fw-semibold" data-bs-toggle="modal" data-bs-target="#modalProj"><i class="bi bi-folder-plus me-2"></i>Postar Projeto</button>
             </div>
         </div>
