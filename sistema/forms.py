@@ -15,7 +15,7 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 
 # importando as tabelas e o db
 from sistema import db, bcrypt, app
-from sistema.models import Usuario # importar as tabelas do models
+from sistema.models import Usuario, Empresa, Aluno, Escola, Funcionario # importar as tabelas do models
 
 # biblioteca usada pra salvar arquivo 
 import os
@@ -28,6 +28,7 @@ class CadastroForm(FlaskForm):
     nome = StringField('Nome', validators=[DataRequired()])
     sobrenome = StringField('Sobrenome', validators=[DataRequired()])
     email = EmailField('Email', validators=[DataRequired(), Email()])
+    perfil = SelectField('Tipo de Usuario', choices=[('aluno', 'Aluno'), ('funcionario', 'Funcionário'), ('empresa', 'Empresa'), ('escola', 'Escola'), ] ,validators=[DataRequired()])
     senha = PasswordField('Senha', validators=[DataRequired()])
     confirmacao_senha = PasswordField('Confirmar Senha', validators=[DataRequired(), EqualTo('senha')])
     btnsubmit = SubmitField('Salvar')
@@ -35,7 +36,7 @@ class CadastroForm(FlaskForm):
     # criando o validador
     def validate_email(self, email):
         if Usuario.query.filter_by(email=email.data).first(): # busca na tabela usuario, na coluna email, o email enviado
-            return ValidationError('Usuario já cadastrado com esse Email!!') # resposta do erro
+            raise ValidationError('Usuario já cadastrado com esse Email!!') # resposta do erro
 
     # criando o save
     def save(self):
@@ -46,6 +47,7 @@ class CadastroForm(FlaskForm):
         usuario = Usuario(
             nome = self.nome.data,
             sobrenome = self.sobrenome.data,
+            perfil = self.perfil.data,
             email = self.email.data,
             senha = senha
         )
@@ -78,3 +80,66 @@ class LoginForm(FlaskForm):
                 raise Exception("Senha incorreta!!")
         else:
             return None
+
+# formulario da empresa
+class EmpresaForm(FlaskForm):
+    nome = StringField('Nome', validators=[DataRequired()])
+    localizacao = StringField('Localização', validators=[DataRequired()])
+    contato = TextAreaField('Contatos', validators=[DataRequired()])
+    
+    # metodo save
+    def save(self, id_user):
+        nova_empresa = Empresa(
+            nome = self.nome.data,
+            localizacao = self.localizacao.data,
+            contato = self.contato.data,
+            usuario_id = id_user
+        )
+
+        db.session.add(nova_empresa)
+        db.session.commit()
+
+        return nova_empresa
+    
+# formulario escola
+class EscolaForm(FlaskForm):
+    nome = StringField('Nome', validators=[DataRequired()])
+    localizacao = StringField('Localização', validators=[DataRequired()])
+    contato = TextAreaField('Contatos', validators=[DataRequired()])
+    
+    # metodo save
+    def save(self, id_user):
+        nova_escola = Escola(
+            nome = self.nome.data,
+            localizacao = self.localizacao.data,
+            contato = self.contato.data,
+            usuario_id = id_user
+        )
+
+        db.session.add(nova_escola)
+        db.session.commit()
+
+        return nova_escola
+
+# formulario aluno
+class AlunoForm(FlaskForm):
+    turma = StringField('Turma', validators=[DataRequired()] )
+    descricao = TextAreaField('Descrição do aluno', validators=[DataRequired()])
+    escola = SelectField('Escola do Aluno', coerce=int, validators=[DataRequired()])
+    
+    def save(self, id_user):
+        novo_aluno = Escola(
+            turma = self.turma.data,
+            descricao = self.descricao.data,
+            escola_id = self.escola.data,
+            usuario_id = id_user
+        )
+
+        db.session.add(novo_aluno)
+        db.session.commit()
+
+        return novo_aluno
+
+# formulario funcionario
+class FuncionarioForm(FlaskForm):
+    pass

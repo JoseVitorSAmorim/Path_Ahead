@@ -11,7 +11,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from sistema.models import Usuario
 
 # importando as classes de formulario
-from sistema.forms import CadastroForm, LoginForm
+from sistema.forms import CadastroForm, LoginForm, AlunoForm, EscolaForm, EmpresaForm, FuncionarioForm
 
 # criando rota de login
 @app.route('/', methods=['GET', 'POST'])

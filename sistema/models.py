@@ -23,6 +23,8 @@ class Usuario(db.Model, UserMixin): # essa tabela vai ter o login
     # relacionamento
     funcionario = db.relationship('Funcionario', backref='user_funcionario', uselist=False, lazy = True)
     aluno = db.relationship('Aluno', backref="user_aluno", uselist=False, lazy=True)
+    empresa = db.relationship('Empresa', backref="user_empresa", uselist=False, lazy=True)
+    escola = db.relationship('Escola', backref="user_escola", uselist=False, lazy=True)
 
 ### ---------Hierarquia Empresa--------- ###
 class Empresa(db.Model):
@@ -30,7 +32,10 @@ class Empresa(db.Model):
     nome = db.Column(db.String(100), nullable = True)
     localizacao = db.Column(db.String(100), nullable = True)
     contato = db.Column(db.String(100), nullable = True)
-
+    
+    # chave estrangeira de login
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
+    
     # relacionamento 
     funcionario = db.relationship('Funcionario', backref="empresa_funcionario", lazy=True)
 
@@ -51,6 +56,9 @@ class Escola(db.Model):
     nome = db.Column(db.String(100), nullable = True)
     localizacao = db.Column(db.String(100), nullable = True)
     contato = db.Column(db.String(100), nullable = True)
+
+    # chave estrangeira de login
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
 
     # relacionamento
     funcionario = db.relationship('Funcionario', backref="escola_funcinario", lazy=True)
