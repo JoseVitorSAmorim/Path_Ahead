@@ -8,10 +8,10 @@ from flask import render_template, url_for, request, redirect, flash
 from flask_login import login_user, logout_user, current_user, login_required
 
 # importando a classe da tabela onde vou salvar
-from sistema.models import Usuario, Escola, Aluno, FuncionarioEscola, Projetos, Post, Empresa, FuncionarioEmpresa, Vagas, Indicacao
+from sistema.models import Usuario
 
 # importando as classes de formulario
-from sistema.forms import LoginForm, CadastroForm, VagasForm, PostForm, EmpresaForm, AlunoForm, EscolaForm, ProjetosForm, FuncionarioEscolaForm, FuncionarioEmpresaForm, IndicacaoForm
+from sistema.forms import CadastroForm, LoginForm
 
 # criando rota de login
 @app.route('/', methods=['GET', 'POST'])
@@ -51,182 +51,8 @@ def Logout():
     
     return redirect(url_for('Login'))
 
-# criando a rota menu
-@app.route('/menu/', methods=['GET', 'POST'])
-@login_required
-def Menu(): 
-    form_post = PostForm()
-    form_escola = EscolaForm()
-    form_empresa = EmpresaForm()
-    form_aluno = AlunoForm()
-    form_funcionario_escola = FuncionarioEscolaForm()
-    form_funcionario_empresa = FuncionarioEmpresaForm()
-    form_vagas = VagasForm()
-    form_indicacao = IndicacaoForm()
-    form_projetos = ProjetosForm()
-
-    # buscando os post
-    posts = Post.query.all()
-
-    # buscando as escolas
-    escolas = Escola.query.all()
-
-    # buscando os alunos
-    alunos = Aluno.query.all()
-
-    # buscando as empresas 
-    empresas = Empresa.query.all()
-
-    # buscando os funcionarios escolas
-    funcionarios_escola = FuncionarioEscola.query.all()
-
-    # buscando os funcionarios empresas
-    funcionarios_empresa = FuncionarioEmpresa.query.all()
+# criando o Menu
+@app.route('/menu-feed')
+def Menu():
     
-    # buscando as vagas postadas
-    vagas_postadas = Vagas.query.all()
-
-    # buscando os alunos indicados
-    inscritos = Indicacao.query.filter(Indicacao.status == 'Candidatar-se').all()
-    print('INSCRITOS', inscritos)
-    
-    # buscando os alunos inscritos
-    indicados = Indicacao.query.filter(Indicacao.status == 'Indicar').all()
-    print('INDICADOS', indicados)
-
-    # buscando todos os projetos
-    projetos = Projetos.query.all()
-    print('PROJETOS', projetos)
-
-
-    # buscando todos os projetos
-    projetos = Projetos.query.all()
-    print('PROJETOS', projetos)
-
-    # abastecendo o choices do select field
-    form_post.escola.choices = [(escola.id, escola.nome) for escola in escolas]
-
-    # abastecendo o form aluno
-    form_aluno.escola.choices = [(escola.id, escola.nome) for escola in escolas]
-
-    # abastecendo o form funcionario/escola
-    form_funcionario_escola.escola.choices = [(escola.id, escola.nome) for escola in escolas]
-
-    # abastecendo o form funcionario/empresa
-    form_funcionario_empresa.empresa.choices = [(empresa.id, empresa.nome) for empresa in empresas]
-
-    # abastecendo o form vagas
-    form_vagas.empresa.choices = [(empresa.id, empresa.nome) for empresa in empresas]
-
-    # abastecendo o form indicacao label indicado
-    form_indicacao.indicado.choices = [(indicado.id, indicado.nome) for indicado in alunos]
-
-    # abastecendo o form indicacao label vaga
-    form_indicacao.vaga.choices = [(vaga.id, vaga.titulo) for vaga in vagas_postadas]
-
-    # abastecendo o form indicacao label escola
-    form_indicacao.escola.choices = [(escola.id, escola.nome) for escola in escolas]
-
-    # abastecendo o form projetos label escola
-    form_projetos.escola.choices = [(escola.id, escola.nome) for escola in escolas]
-
-    if form_post.validate_on_submit() and form_post.btn_post.data:
-        form_post.save()
-        print('post criado com sucesso')
-        return redirect(url_for('Menu'))
-    
-    if form_escola.validate_on_submit() and form_escola.btn_escola.data:
-        form_escola.save()
-        print('Escola cadastrada com sucesso')
-        return redirect(url_for('Menu'))
-
-    if form_aluno.validate_on_submit() and form_aluno.btn_aluno.data:
-        form_aluno.save()
-        print('Aluno criado com sucesso')
-        return redirect(url_for('Menu'))
-    
-    if form_empresa.validate_on_submit() and form_empresa.btn_empresa.data:
-        form_empresa.save() # Chamado APENAS UMA VEZ
-        print('Empresa cadastrada com sucesso')
-        return redirect(url_for('Menu'))
-
-    if form_funcionario_escola.validate_on_submit() and form_funcionario_escola.btn_funcionario_escola.data:
-        form_funcionario_escola.save()
-        print('Funcionario cadastrado na escola com sucesso')
-        return redirect(url_for('Menu'))
-    
-    if form_funcionario_empresa.validate_on_submit() and form_funcionario_empresa.btn_funcionario_empresa.data:
-        form_funcionario_empresa.save()
-        print('Funcionario Cadastrado na empresa com sucesso')
-        return redirect(url_for('Menu'))
-
-    if form_vagas.validate_on_submit() and form_vagas.btn_vaga.data:
-        form_vagas.save()
-        print('Vaga postada com sucesso')
-        return redirect(url_for('Menu'))
-    
-    if form_indicacao.validate_on_submit() and form_indicacao.btn_indicacao.data:
-        form_indicacao.save()
-        print('Aluno indicado com sucesso')
-        return redirect(url_for('Menu'))
-    
-    if form_indicacao.validate_on_submit() and form_indicacao.btn_candidatar.data:
-        form_indicacao.save(aluno_logado_id=current_user.id)
-        print('Aluno inscrito com sucesso')
-        return redirect(url_for('Menu'))
-    
-    if form_projetos.validate_on_submit() and form_projetos.btn_projetos.data:
-        form_projetos.save()
-        print('Projeto Postado com sucesso')
-        return redirect(url_for('Menu'))
-        
-    return render_template(
-        'menu.html', 
-        form_post = form_post, 
-        form_escola = form_escola, 
-        posts = posts, 
-        form_empresa = form_empresa, 
-        form_aluno = form_aluno, 
-        form_funcionario_escola = form_funcionario_escola, 
-        form_funcionario_empresa = form_funcionario_empresa,
-        alunos = alunos,
-        empresas = empresas,
-        escolas = escolas,
-        funcionarios_escola = funcionarios_escola,
-        funcionarios_empresa = funcionarios_empresa,
-        form_vagas = form_vagas,
-        vagas_postadas = vagas_postadas,
-        form_indicacao = form_indicacao,
-        indicados = indicados,
-        inscritos = inscritos,
-        form_projetos = form_projetos,
-        projetos = projetos
-        )
-
-# criando a rota vagas
-@app.route('/vagas/', methods=['GET', 'POST'])
-@login_required
-def Vagas_Page():
-    form_vagas = VagasForm()
-    
-    # O seu processamento de banco de dados (que você comentou que fará depois) entra aqui:
-    if form_vagas.validate_on_submit():
-        form_vagas.save()
-        return redirect(url_for('Vagas_Page'))
-        
-    return render_template('vagas.html', form_vagas=form_vagas)
-
-# criando a rota projetos
-@app.route('/projetos/', methods=['GET', 'POST'])
-@login_required
-def Projetos_Page():
-    
-    return f"<h1>Pagina Projetos</h1>"
-
-# criando a rota perfil
-@app.route('/perfil/', methods=['GET', 'POST'])
-@login_required
-def Perfil_Page():
-    
-    return f"<h1>Pagina Perfil</h1>"
-
+    return render_template('menu.html')

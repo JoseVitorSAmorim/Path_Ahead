@@ -1,95 +1,73 @@
 {% extends 'base.html' %}
 
-{% block titulo %} Acesso ao Sistema {% endblock %}
+{% block titulo %} Login {% endblock %}
 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh;">
-    <div class="card shadow-lg border-0" style="width: 100%; max-width: 420px; border-radius: 12px;">
-        <div class="card-header bg-primary text-white text-center py-4" style="border-top-left-radius: 12px; border-top-right-radius: 12px;">
-            <h3 class="mb-0 fw-bold">DevNetwork</h3>
-            <p class="small mb-0 opacity-75">Gestão Integrada de Atletas e Vagas</p>
-        </div>
-        <div class="card-body p-4">
-            
-            {# Exibição de Mensagens Flash #}
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-
-            {# Formulário de Login Principal #}
-            <form action="" method="POST">
-                {{ form_login.csrf_token }}
-                <div class="mb-3">
-                    {{ form_login.email.label(class="form-label fw-semibold text-secondary small") }}
-                    {{ form_login.email(class="form-control form-control-lg", placeholder="seu@email.com") }}
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+        <div class="card shadow-lg border-0" style="width: 100%; max-width: 450px;">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <h2 class="mb-0 fw-bold">Bem-vindo</h2>
+                <p class="small mb-0">Acesse sua conta para continuar</p>
+            </div>
+            <div class="card-body p-4">
+                <form action="" method="post">
+                    {{ form_login.csrf_token }}
+                    <div class="mb-3">
+                        {{ form_login.email.label(class="form-label fw-semibold") }}
+                        {{ form_login.email(class="form-control form-control-lg", placeholder="seu@email.com") }}
+                    </div>
+                    <div class="mb-4">
+                        {{ form_login.senha.label(class="form-label fw-semibold") }}
+                        {{ form_login.senha(class="form-control form-control-lg", placeholder="********") }}
+                    </div>
+                    {{ form_login.btnsubmit(class="btn btn-primary btn-lg w-100 shadow-sm") }}
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted">Não tem cadastro? 
+                        <a href="#" class="text-primary fw-bold text-decoration-none" data-bs-toggle="modal" data-bs-target="#cadastro">Cadastre-se aqui</a>
+                    </p>
                 </div>
-                <div class="mb-4">
-                    {{ form_login.senha.label(class="form-label fw-semibold text-secondary small") }}
-                    {{ form_login.senha(class="form-control form-control-lg", placeholder="********") }}
-                </div>
-                {{ form_login.btnsubmit(class="btn btn-primary btn-lg w-100 shadow-sm fw-bold mb-3") }}
-            </form>
-            
-            <div class="text-center mt-3">
-                <span class="text-muted small">Não possui uma conta?</span>
-                <button type="button" class="btn btn-link p-0 small fw-bold text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalCadastro">
-                    Cadastre-se aqui
-                </button>
             </div>
         </div>
     </div>
-</div>
 
-<div class="modal fade" id="modalCadastro" tabindex="-1" aria-labelledby="modalCadastroLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 12px;">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title fw-bold" id="modalCadastroLabel"><i class="bi bi-person-plus-fill me-2"></i>Criar Nova Conta</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="" method="POST">
+    <div class="modal fade" id="cadastro" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">Nova Conta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body p-4">
-                    {{ form_cadastro.csrf_token }}
-                    <div class="row g-2 mb-3">
-                        <div class="col-md-6">
-                            {{ form_cadastro.nome.label(class="form-label small fw-semibold") }}
-                            {{ form_cadastro.nome(class="form-control") }}
+                    <form action="" method="post">
+                        {{ form_cadastro.csrf_token }}
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                {{ form_cadastro.nome.label(class="form-label") }}
+                                {{ form_cadastro.nome(class="form-control") }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_cadastro.sobrenome.label(class="form-label") }}
+                                {{ form_cadastro.sobrenome(class="form-control") }}
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            {{ form_cadastro.sobrenome.label(class="form-label small fw-semibold") }}
-                            {{ form_cadastro.sobrenome(class="form-control") }}
+                        <div class="mb-3">
+                            {{ form_cadastro.email.label(class="form-label") }}
+                            {{ form_cadastro.email(class="form-control") }}
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        {{ form_cadastro.email.label(class="form-label small fw-semibold") }}
-                        {{ form_cadastro.email(class="form-control", placeholder="nome@exemplo.com") }}
-                    </div>
-                    <div class="mb-3">
-                        {{ form_cadastro.categoria.label(class="form-label small fw-semibold") }}
-                        {{ form_cadastro.categoria(class="form-control", placeholder="Crie uma senha forte") }}
-                    </div>
-                    <div class="mb-3">
-                        {{ form_cadastro.senha.label(class="form-label small fw-semibold") }}
-                        {{ form_cadastro.senha(class="form-control", placeholder="Crie uma senha forte") }}
-                    </div>
-                    <div class="mb-3">
-                        {{ form_cadastro.confirmacao_senha.label(class="form-label small fw-semibold") }}
-                        {{ form_cadastro.confirmacao_senha(class="form-control", placeholder="Repita a senha") }}
-                    </div>
+                        <div class="mb-3">
+                            {{ form_cadastro.senha.label(class="form-label") }}
+                            {{ form_cadastro.senha(class="form-control") }}
+                        </div>
+                        <div class="mb-4">
+                            {{ form_cadastro.confirmacao_senha.label(class="form-label") }}
+                            {{ form_cadastro.confirmacao_senha(class="form-control") }}
+                        </div>
+                        {{ form_cadastro.btnsubmit(class="btn btn-success w-100") }}
+                    </form>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal">Cancelar</button>
-                    {{ form_cadastro.btnsubmit(class="btn btn-success fw-bold px-4") }}
-                </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}

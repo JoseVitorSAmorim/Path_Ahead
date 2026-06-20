@@ -1,2 +1,1 @@
-# EPT-Trabalho
-O nome poderá mudar posteriormente
+# Criando um projeto de visualização de dados
