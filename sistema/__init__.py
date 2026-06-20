@@ -27,6 +27,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # token de segurança
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') # acessando as variaveis do ambiente virtual
+
 # Naming Convention
 from sqlalchemy import MetaData
 
@@ -39,11 +40,8 @@ metadata = MetaData(naming_convention={
     "pk": "pk_%(table_name)s"
 })
 
-# Inicialize o db passando essa convenção
-db = SQLAlchemy(metadata=metadata)
-
 # definindo a variavel do banco de dados
-db = SQLAlchemy(app)
+db = SQLAlchemy(app, metadata=metadata)
 
 # definindo o app de migrate
 migrate = Migrate(app, db)
