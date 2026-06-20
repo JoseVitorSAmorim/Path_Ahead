@@ -2,139 +2,68 @@ from sistema import db, login_manager
 from datetime import datetime
 from flask_login import UserMixin
 
+# recuperando o usuario
 @login_manager.user_loader
 def load_user(user_id):
+
     return Usuario.query.get(int(user_id))
 
-# ==========================================
-# 1. USUÁRIO (Autenticação)
-# ==========================================
-class Usuario(db.Model, UserMixin):
-    __tablename__ = 'usuario'
-    id = db.Column(db.Integer, primary_key=True) 
-    nome = db.Column(db.String(200), nullable=True)
-    sobrenome = db.Column(db.String(200), nullable=True)
-    email = db.Column(db.String(200), nullable=False, unique=True)
-    senha = db.Column(db.String(200), nullable=False)
-    categoria = db.Column(db.String(200), nullable=False) # aluno, escola, empresa, funcionario
+### ----------Usuario---------- ###
+# tabela de usuario que define os acessos
+class Usuario(db.Model, UserMixin): # essa tabela vai ter o login
+    id = db.Column(db.Integer, primary_key = True) 
+    nome = db.Column(db.String, nullable = True)
+    sobrenome = db.Column(db.String, nullable = True)
+    email = db.Column(db.String, nullable = True, unique = True)
+    senha = db.Column(db.String, nullable = True)
 
-# ==========================================
-# 2. ESTRUTURA ESCOLA
-# ==========================================
-class Escola(db.Model):
-    __tablename__ = 'escola'
-    id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(200), nullable=False)
-    localizacao = db.Column(db.String(200), nullable=False)
-    contato = db.Column(db.String(200), nullable=False)
-    
-    # Relacionamentos lógicos (Uma escola tem vários filhos)
-    alunos = db.relationship('Aluno', backref='aluno_escola', lazy=True, cascade='all, delete-orphan')
-    funcionarios = db.relationship('FuncionarioEscola', backref='funcionario_escola', lazy=True, cascade='all, delete-orphan')
-    projetos = db.relationship('Projetos', backref='projeto_escola', lazy=True, cascade='all, delete-orphan')
-    posts = db.relationship('Post', backref='post_escola', lazy=True, cascade='all, delete-orphan')
-    indicacoes = db.relationship('Indicacao', backref='indicacao_escola', lazy=True, cascade='all, delete-orphan')
+    # coluna de perfil
+    perfil = db.Column(db.String, nullable = True) # aluno, empresa, funcionario, escola.
 
-class Aluno(db.Model):
-    __tablename__ = 'aluno'
-    id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100), nullable=False)
-    turma = db.Column(db.String(100), nullable=False, unique=True)
-    email = db.Column(db.String(100), nullable=False, unique=True)
-    senha = db.Column(db.String(100), nullable=False)
-    contato = db.Column(db.Text, nullable=False)
-    
-    # Chave estrangeira correta: o Aluno pertence a uma Escola
-    id_colegio = db.Column(db.Integer, db.ForeignKey('escola.id'), nullable=False)
+    # relacionamento
+    funcionario = db.relationship('Funcionario', backref='user_funcionario', uselist=False, lazy = True)
+    aluno = db.relationship('Aluno', backref="user_aluno", uselist=False, lazy=True)
 
-    # Relacionamentos lógicos (Um aluno tem varias indicações)
-    indicado = db.relationship('Indicacao', backref = 'indicacao_aluno', lazy = True, cascade='all, delete-orphan')
-    
-class FuncionarioEscola(db.Model):
-    __tablename__ = 'funcionario_escola'
-    id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100), nullable=False) 
-    cargo = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
-    senha = db.Column(db.String(100), nullable=False)
-    contato = db.Column(db.Text, nullable=False)
-    
-    # Chave estrangeira correta: o Funcionário pertence a uma Escola
-    id_colegio = db.Column(db.Integer, db.ForeignKey('escola.id'), nullable=False)
-
-class Projetos(db.Model):
-    __tablename__ = 'projetos'
-    id = db.Column(db.Integer, primary_key=True)
-    titulo = db.Column(db.String(100), nullable=False)
-    descricao = db.Column(db.Text, nullable=False)
-    data_postagem = db.Column(db.Date, default=datetime.utcnow)
-    imagem = db.Column(db.String, nullable=False, default = 'default.png')
-    
-    # Chave estrangeira correta: o Projeto pertence a uma Escola
-    id_escola = db.Column(db.Integer, db.ForeignKey('escola.id'), nullable=False)
-
-class Post(db.Model):
-    __tablename__ = 'post'
-    id = db.Column(db.Integer, primary_key=True)
-    titulo = db.Column(db.String(100), nullable=False)
-    descricao = db.Column(db.Text, nullable=False)
-    data_postagem = db.Column(db.Date, default=datetime.utcnow)
-    
-    # Chave estrangeira
-    id_escola = db.Column(db.Integer, db.ForeignKey('escola.id'), nullable=False)
-
-# ==========================================
-# 3. ESTRUTURA EMPRESA
-# ==========================================
+### ---------Hierarquia Empresa--------- ###
 class Empresa(db.Model):
-    __tablename__ = 'empresa'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nome = db.Column(db.String(100), nullable=False)
-    localizacao = db.Column(db.String(150), nullable=False)
-    contato = db.Column(db.Text, nullable=False)
-    
-    # Relacionamentos lógicos (Uma empresa tem vários funcionários e vagas)
-    funcionarios = db.relationship('FuncionarioEmpresa', backref='empresa_funcionario', lazy=True, cascade='all, delete-orphan')
-    vagas = db.relationship('Vagas', backref='empresa_vagas', lazy=True, cascade='all, delete-orphan')
+    id = db.Column(db.Integer, primary_key = True)
+    nome = db.Column(db.String(100), nullable = True)
+    localizacao = db.Column(db.String(100), nullable = True)
+    contato = db.Column(db.String(100), nullable = True)
 
-class FuncionarioEmpresa(db.Model):
-    __tablename__ = 'funcionario_empresa'
-    id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100), nullable=False)
-    cargo = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
-    senha = db.Column(db.String(100), nullable=False)
-    contato = db.Column(db.String(100), nullable=False)
-    
-    # Chave estrangeira correta: o Funcionário pertence a uma Empresa
-    id_empresa = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    # relacionamento 
+    funcionario = db.relationship('Funcionario', backref="empresa_funcionario", lazy=True)
 
-# ==========================================
-# 4. PROCESSOS (Vagas e Indicações)
-# ==========================================
-class Vagas(db.Model):
-    __tablename__ = 'vagas'
-    id = db.Column(db.Integer, primary_key=True)
-    titulo = db.Column(db.String(100), nullable=False)  # Corrigido: adicionado tipo String
-    descricao = db.Column(db.Text, nullable=False)     # Corrigido: adicionado tipo Text
-    
-    # Chave estrangeira: a Vaga pertence a uma Empresa
-    id_empresa = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
-    
-    # Relacionamento lógico com indicações recebidas nesta vaga
-    indicacoes = db.relationship('Indicacao', backref='vaga_indicada', lazy=True, cascade='all, delete-orphan')
+### -----------Tabela de funcionario base----------- ###
+class Funcionario(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
 
-class Indicacao(db.Model):
-    __tablename__ = 'indicacao'
-    id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.String(20), nullable=False) # inscrito, indicado, etc.
+    # chave estrangeira de login
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
     
+    # chave estrangeira de empresa ou escola
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'))
+    escola_id = db.Column(db.Integer, db.ForeignKey('escola.id'))
 
-    # Chaves estrangeiras da tabela intermediária (Quem indicou e para qual vaga)
-    id_escola = db.Column(db.Integer, db.ForeignKey('escola.id'), nullable=False)
-    id_vaga = db.Column(db.Integer, db.ForeignKey('vagas.id'), nullable=False)
-    id_aluno = db.Column(db.Integer, db.ForeignKey('aluno.id'), nullable = True)
+### -----------Hierarquia Escola---------- ###
+class Escola(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    nome = db.Column(db.String(100), nullable = True)
+    localizacao = db.Column(db.String(100), nullable = True)
+    contato = db.Column(db.String(100), nullable = True)
 
-    rel_escola = db.relationship('Escola', foreign_keys=[id_escola])
-    rel_vaga = db.relationship('Vagas', foreign_keys=[id_vaga])
-    rel_aluno = db.relationship('Aluno', foreign_keys=[id_aluno])
+    # relacionamento
+    funcionario = db.relationship('Funcionario', backref="escola_funcinario", lazy=True)
+    aluno = db.relationship('Aluno', backref="escola_aluno", lazy=True)
+
+### ------------tabela aluno------------ ###
+class Aluno(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    turma = db.Column(db.String(30), nullable = True)
+    descricao = db.Column(db.Text, nullable = True)
+
+    # chave estrangeira de login
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
+
+    # chave estrangeira escola
+    escola_id = db.Column(db.Integer, db.ForeignKey('escola.id'))
