@@ -28,7 +28,7 @@ class CadastroForm(FlaskForm):
     nome = StringField('Nome', validators=[DataRequired()])
     sobrenome = StringField('Sobrenome', validators=[DataRequired()])
     email = EmailField('Email', validators=[DataRequired(), Email()])
-    perfil = SelectField('Tipo de Usuario', choices=[('aluno', 'Aluno'), ('funcionario', 'Funcionário'), ('empresa', 'Empresa'), ('escola', 'Escola'), ] ,validators=[DataRequired()])
+    perfil = SelectField('Tipo de Usuario', choices=[('aluno', 'Aluno'), ('funcionario', 'Funcionário'), ('empresa', 'Empresa'), ('escola', 'Escola'), ('admin', 'Admin')] ,validators=[DataRequired()])
     senha = PasswordField('Senha', validators=[DataRequired()])
     confirmacao_senha = PasswordField('Confirmar Senha', validators=[DataRequired(), EqualTo('senha')])
     btnsubmit = SubmitField('Salvar')
@@ -86,6 +86,7 @@ class EmpresaForm(FlaskForm):
     nome = StringField('Nome', validators=[DataRequired()])
     localizacao = StringField('Localização', validators=[DataRequired()])
     contato = TextAreaField('Contatos', validators=[DataRequired()])
+    btn_empresa = SubmitField('Cadastrar')
     
     # metodo save
     def save(self, id_user):
@@ -106,6 +107,7 @@ class EscolaForm(FlaskForm):
     nome = StringField('Nome', validators=[DataRequired()])
     localizacao = StringField('Localização', validators=[DataRequired()])
     contato = TextAreaField('Contatos', validators=[DataRequired()])
+    btn_escola = SubmitField('Cadastrar')
     
     # metodo save
     def save(self, id_user):
@@ -126,7 +128,8 @@ class AlunoForm(FlaskForm):
     turma = StringField('Turma', validators=[DataRequired()] )
     descricao = TextAreaField('Descrição do aluno', validators=[DataRequired()])
     escola = SelectField('Escola do Aluno', coerce=int, validators=[DataRequired()])
-    
+    btn_aluno = SubmitField('Cadastrar')
+
     def save(self, id_user):
         novo_aluno = Escola(
             turma = self.turma.data,
@@ -142,4 +145,22 @@ class AlunoForm(FlaskForm):
 
 # formulario funcionario
 class FuncionarioForm(FlaskForm):
-    pass
+    escola = SelectField('Escola do funcionario', coerce=int)
+    empresa = SelectField('Empresa do funcionario', coerce=int)
+    btn_funcionario = SubmitField('Cadastrar')
+
+    def save(self, id_user):
+        if self.escola.data and self.empresa.data == None:
+            raise ValidationError("Voce deve selecionar 1 das opções pelo menos...")
+        
+        novo_funcionario = Funcionario(
+            usuario_id = id_user,
+            escola_id = self.escola.data,
+            empresa_id = self.empresa.data
+        ) 
+    
+        db.session.add(novo_funcionario)
+        db.session.commit()
+
+        return novo_funcionario
+    
