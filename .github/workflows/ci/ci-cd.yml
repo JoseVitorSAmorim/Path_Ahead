@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Deploy via SSH na VPS Hostgator
+    - name: Deploy via SSH 
       uses: appleboy/ssh-action@v0.1.10
       with:
         host: ${{ secrets.VPS_HOST }}
