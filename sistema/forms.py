@@ -8,14 +8,14 @@ from flask import current_app
 from wtforms import StringField, EmailField, PasswordField, SubmitField, PasswordField, IntegerField, SelectField, TextAreaField
 
 # importando os campos de arquivo
-from flask_wtf.file import FileField, FileAllowed, FileRequired
+from flask_wtf.file import FileField, FileAllowed, FileRequired, MultipleFileField
 
 # importando os validators
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 
 # importando as tabelas e o db
 from sistema import db, bcrypt, app
-from sistema.models import Usuario, Empresa, Aluno, Escola, Funcionario # importar as tabelas do models
+from sistema.models import Usuario, Empresa, Aluno, Escola, Funcionario, Post # importar as tabelas do models
 
 # biblioteca usada pra salvar arquivo 
 import os
@@ -31,7 +31,7 @@ class CadastroForm(FlaskForm):
     perfil = SelectField('Tipo de Usuario', choices=[('aluno', 'Aluno'), ('funcionario', 'Funcionário'), ('empresa', 'Empresa'), ('escola', 'Escola'), ('admin', 'Admin')] ,validators=[DataRequired()])
     senha = PasswordField('Senha', validators=[DataRequired()])
     confirmacao_senha = PasswordField('Confirmar Senha', validators=[DataRequired(), EqualTo('senha')])
-    btnsubmit = SubmitField('Salvar')
+    btn_cadastro = SubmitField('Salvar')
 
     # criando o validador
     def validate_email(self, email):
@@ -64,7 +64,7 @@ class CadastroForm(FlaskForm):
 class LoginForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     senha = PasswordField('Senha', validators=[DataRequired()])
-    btnsubmit = SubmitField('Enviar')
+    btn_login = SubmitField('Enviar')
 
     # função de logar
     def login(self):
@@ -81,61 +81,52 @@ class LoginForm(FlaskForm):
         else:
             return None
 
-# formulario da empresa
 class EmpresaForm(FlaskForm):
-    nome = StringField('Nome', validators=[DataRequired()])
-    localizacao = StringField('Localização', validators=[DataRequired()])
-    contato = TextAreaField('Contatos', validators=[DataRequired()])
+    nome = StringField('Nome da Empresa')
+    localizacao = StringField('Localização')
+    contato = TextAreaField('Contatos')
     btn_empresa = SubmitField('Cadastrar')
     
-    # metodo save
     def save(self, id_user):
         nova_empresa = Empresa(
-            nome = self.nome.data,
-            localizacao = self.localizacao.data,
-            contato = self.contato.data,
-            usuario_id = id_user
+            nome=self.nome.data,
+            localizacao=self.localizacao.data,
+            contato=self.contato.data,
+            usuario_id=id_user
         )
-
         db.session.add(nova_empresa)
         db.session.commit()
-
         return nova_empresa
     
-# formulario escola
 class EscolaForm(FlaskForm):
-    nome = StringField('Nome', validators=[DataRequired()])
-    localizacao = StringField('Localização', validators=[DataRequired()])
-    contato = TextAreaField('Contatos', validators=[DataRequired()])
+    nome = StringField('Nome da Escola')
+    localizacao = StringField('Localização')
+    contato = TextAreaField('Contatos')
     btn_escola = SubmitField('Cadastrar')
-    
-    # metodo save
+
     def save(self, id_user):
         nova_escola = Escola(
-            nome = self.nome.data,
-            localizacao = self.localizacao.data,
-            contato = self.contato.data,
-            usuario_id = id_user
+            nome=self.nome.data,
+            localizacao=self.localizacao.data,
+            contato=self.contato.data,
+            usuario_id=id_user
         )
-
         db.session.add(nova_escola)
         db.session.commit()
-
         return nova_escola
 
-# formulario aluno
 class AlunoForm(FlaskForm):
-    turma = StringField('Turma', validators=[DataRequired()] )
-    descricao = TextAreaField('Descrição do aluno', validators=[DataRequired()])
-    escola = SelectField('Escola do Aluno', coerce=int, validators=[DataRequired()])
+    turma = StringField('Turma')
+    descricao = TextAreaField('Descrição do aluno')
+    escola = SelectField('Escola do Aluno', coerce=int)
     btn_aluno = SubmitField('Cadastrar')
 
     def save(self, id_user):
-        novo_aluno = Escola(
-            turma = self.turma.data,
-            descricao = self.descricao.data,
-            escola_id = self.escola.data,
-            usuario_id = id_user
+        novo_aluno = Aluno( 
+            turma=self.turma.data,
+            descricao=self.descricao.data,
+            escola_id=self.escola.data,
+            usuario_id=id_user
         )
 
         db.session.add(novo_aluno)
@@ -143,24 +134,39 @@ class AlunoForm(FlaskForm):
 
         return novo_aluno
 
-# formulario funcionario
 class FuncionarioForm(FlaskForm):
     escola = SelectField('Escola do funcionario', coerce=int)
     empresa = SelectField('Empresa do funcionario', coerce=int)
     btn_funcionario = SubmitField('Cadastrar')
 
     def save(self, id_user):
-        if self.escola.data and self.empresa.data == None:
-            raise ValidationError("Voce deve selecionar 1 das opções pelo menos...")
+        # Converte o valor 0 (caso escolha "Nenhum") para None
+        escola_id = self.escola.data if self.escola.data != 0 else None
+        empresa_id = self.empresa.data if self.empresa.data != 0 else None
         
         novo_funcionario = Funcionario(
-            usuario_id = id_user,
-            escola_id = self.escola.data,
-            empresa_id = self.empresa.data
+            usuario_id=id_user,
+            escola_id=escola_id,
+            empresa_id=empresa_id
         ) 
-    
         db.session.add(novo_funcionario)
         db.session.commit()
-
         return novo_funcionario
+
+class VagasForm(FlaskForm):
+    titulo = StringField('Titulo da Postagem', validators=[DataRequired()])
+    tipo = SelectField('Categoria', choices=[('postagem', 'Postagem'), ('vagas', 'Vagas'), ('projetos', 'Projetos')])
+    incritos = SelectField('Escolha um Candidato', coerce=int)
     
+    # botoes de save
+    btn_vagas = SubmitField('Enviar')
+    btn_incrito = SubmitField('Inscrever-se')
+
+    # metodos
+    # se for somente postagem
+    def save_post(self, current_user):
+        novo_post = Post(
+            titulo = self.titulo.data,
+            autor = current_user,
+            tipo = self.tipo.data
+        )

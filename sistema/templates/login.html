@@ -3,6 +3,7 @@
 {% block titulo %} Login {% endblock %}
 
 {% block content %}
+    <!-- CARD PRINCIPAL DE LOGIN -->
     <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
         <div class="card shadow-lg border-0" style="width: 100%; max-width: 450px;">
             <div class="card-header bg-primary text-white text-center py-4">
@@ -20,7 +21,7 @@
                         {{ form_login.senha.label(class="form-label fw-semibold") }}
                         {{ form_login.senha(class="form-control form-control-lg", placeholder="********") }}
                     </div>
-                    {{ form_login.btnsubmit(class="btn btn-primary btn-lg w-100 shadow-sm") }}
+                    {{ form_login.btn_login(class="btn btn-primary btn-lg w-100 shadow-sm") }}
                 </form>
                 
                 <div class="text-center mt-4">
@@ -32,16 +33,19 @@
         </div>
     </div>
 
+    <!-- MODAL DE CADASTRO DINÂMICO -->
     <div class="modal fade" id="cadastro" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title">Nova Conta</h5>
+                    <h5 class="modal-title fw-bold">Nova Conta</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
                     <form action="" method="post">
                         {{ form_cadastro.csrf_token }}
+                        
+                        <!-- Dados Básicos de Usuário -->
                         <div class="row g-2 mb-3">
                             <div class="col-md-6">
                                 {{ form_cadastro.nome.label(class="form-label") }}
@@ -57,6 +61,76 @@
                             {{ form_cadastro.email(class="form-control") }}
                         </div>
                         <div class="mb-3">
+                            {{ form_cadastro.perfil.label(class="form-label") }}
+                            {{ form_cadastro.perfil(class="form-control", id="select-perfil") }}
+                        </div>
+
+                        <!-- SEÇÃO DINÂMICA: EMPRESA -->
+                        <div id="secao-empresa" class="d-none border p-3 rounded mb-3 bg-light">
+                            <h6 class="fw-bold text-primary mb-3">Dados da Empresa</h6>
+                            <div class="mb-2">
+                                {{ form_empresa.nome.label(class="form-label") }}
+                                {{ form_empresa.nome(class="form-control") }}
+                            </div>
+                            <div class="mb-2">
+                                {{ form_empresa.localizacao.label(class="form-label") }}
+                                {{ form_empresa.localizacao(class="form-control") }}
+                            </div>
+                            <div class="mb-2">
+                                {{ form_empresa.contato.label(class="form-label") }}
+                                {{ form_empresa.contato(class="form-control", rows="2") }}
+                            </div>
+                        </div>
+
+                        <!-- SEÇÃO DINÂMICA: ESCOLA -->
+                        <div id="secao-escola" class="d-none border p-3 rounded mb-3 bg-light">
+                            <h6 class="fw-bold text-success mb-3">Dados da Escola</h6>
+                            <div class="mb-2">
+                                {{ form_escola.nome.label(class="form-label") }}
+                                {{ form_escola.nome(class="form-control") }}
+                            </div>
+                            <div class="mb-2">
+                                {{ form_escola.localizacao.label(class="form-label") }}
+                                {{ form_escola.localizacao(class="form-control") }}
+                            </div>
+                            <div class="mb-2">
+                                {{ form_escola.contato.label(class="form-label") }}
+                                {{ form_escola.contato(class="form-control", rows="2") }}
+                            </div>
+                        </div>
+
+                        <!-- SEÇÃO DINÂMICA: ALUNO -->
+                        <div id="secao-aluno" class="d-none border p-3 rounded mb-3 bg-light">
+                            <h6 class="fw-bold text-warning mb-3">Dados do Aluno</h6>
+                            <div class="mb-2">
+                                {{ form_aluno.turma.label(class="form-label") }}
+                                {{ form_aluno.turma(class="form-control") }}
+                            </div>
+                            <div class="mb-2">
+                                {{ form_aluno.escola.label(class="form-label") }}
+                                {{ form_aluno.escola(class="form-select") }}
+                            </div>
+                            <div class="mb-2">
+                                {{ form_aluno.descricao.label(class="form-label") }}
+                                {{ form_aluno.descricao(class="form-control", rows="2") }}
+                            </div>
+                        </div>
+
+                        <!-- SEÇÃO DINÂMICA: FUNCIONÁRIO -->
+                        <div id="secao-funcionario" class="d-none border p-3 rounded mb-3 bg-light">
+                            <h6 class="fw-bold text-info mb-3">Dados do Funcionário</h6>
+                            <div class="mb-2">
+                                {{ form_funcionario.escola.label(class="form-label") }}
+                                {{ form_funcionario.escola(class="form-select") }}
+                            </div>
+                            <div class="mb-2">
+                                {{ form_funcionario.empresa.label(class="form-label") }}
+                                {{ form_funcionario.empresa(class="form-select") }}
+                            </div>
+                        </div>
+
+                        <!-- Senhas e Envio -->
+                        <div class="mb-3">
                             {{ form_cadastro.senha.label(class="form-label") }}
                             {{ form_cadastro.senha(class="form-control") }}
                         </div>
@@ -64,10 +138,30 @@
                             {{ form_cadastro.confirmacao_senha.label(class="form-label") }}
                             {{ form_cadastro.confirmacao_senha(class="form-control") }}
                         </div>
-                        {{ form_cadastro.btnsubmit(class="btn btn-success w-100") }}
+                        
+                        {{ form_cadastro.btn_cadastro(class="btn btn-success w-100") }}
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- SCRIPT DE ALTERAÇÃO VISUAL -->
+    <script>
+        document.getElementById('select-perfil').addEventListener('change', function() {
+            let perfil = this.value;
+            
+            // Esconde todas as seções
+            document.getElementById('secao-empresa').classList.add('d-none');
+            document.getElementById('secao-escola').classList.add('d-none');
+            document.getElementById('secao-aluno').classList.add('d-none');
+            document.getElementById('secao-funcionario').classList.add('d-none');
+            
+            // Mostra a selecionada
+            if (perfil === 'empresa') document.getElementById('secao-empresa').classList.remove('d-none');
+            if (perfil === 'escola') document.getElementById('secao-escola').classList.remove('d-none');
+            if (perfil === 'aluno') document.getElementById('secao-aluno').classList.remove('d-none');
+            if (perfil === 'funcionario') document.getElementById('secao-funcionario').classList.remove('d-none');
+        });
+    </script>
 {% endblock %}

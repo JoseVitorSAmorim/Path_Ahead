@@ -11,7 +11,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from sistema.models import Usuario, Aluno, Empresa, Escola, Funcionario
 
 # importando as classes de formulario
-from sistema.forms import CadastroForm, LoginForm, AlunoForm, EscolaForm, EmpresaForm, FuncionarioForm
+from sistema.forms import CadastroForm, LoginForm, AlunoForm, EscolaForm, EmpresaForm, FuncionarioForm, VagasForm
 
 # criando rota de login
 @app.route('/', methods=['GET', 'POST'])
@@ -21,7 +21,7 @@ def Login():
     form_login = LoginForm()
 
     # verificando o login
-    if form_login.validate_on_submit():
+    if form_login.validate_on_submit() and 'btnsubmit' in request.form:
         user = form_login.login()
 
         if user:
@@ -29,31 +29,7 @@ def Login():
             return redirect(url_for('Menu'))
         else:
             flash('E-mail ou Senha incorretos!!', 'danger')
-
-        # verificando cadastro
-        if form_cadastro.validate_on_submit():
-            # se estiver aqui, já verificou se o email é ou não repetido
-            user = form_cadastro.save()
-            # se user não for vazio
-            if user:
-                login_user(user, remember=True)
-                return redirect(url_for('Menu'))
-            else:
-                flash('Erro ao criar usuario, tente novamente.', 'danger')
-
-    return render_template('login.html', form_cadastro=form_cadastro, form_login=form_login)
-
-# criando o logout(sair)
-@app.route('/sair/')
-@login_required
-def Logout():
-    logout_user()
     
-    return redirect(url_for('Login'))
-
-# criando o Menu
-@app.route('/menu-feed', methods=['GET', 'POST'])
-def Menu():
     # buscando os dados
     escolas = Escola.query.all()
     empresas = Empresa.query.all()
@@ -69,34 +45,62 @@ def Menu():
     form_funcionario.escola.choices = [(escola.id, escola.nome) for escola in escolas]
     form_funcionario.empresa.choices = [(empresa.id, empresa.nome) for empresa in empresas]
     
-    # validando os formularios
-
-    ### Formulario empresa ###
-    if 'btn_empresa' in request.form:
-        if form_empresa.validate_on_submit():
-            form_empresa.save(current_user.id)
-
-            return redirect(url_for('Menu'))
-    
-    ### Formulario escola ###
-    if 'btn_escola' in request.form:
-        if form_escola.validate_on_submit():
-            form_escola.save(current_user.id)
-
-            return redirect(url_for('Menu'))
+    # PROCESSO: Executar Cadastro Completo e Dinâmico
+    if form_cadastro.validate_on_submit() and 'nome' in request.form:
+        perfil = form_cadastro.perfil.data
         
-    ### Formulario aluno ###
-    if 'btn_aluno' in request.form:
-        if form_aluno.validate_on_submit():
-            form_aluno.save(current_user.id)
-
-            return redirect(url_for('Menu'))
+        # VALIDAÇÃO MANUAL: Garante que os campos dinâmicos não vieram vazios
+        if perfil == 'aluno' and not form_aluno.turma.data:
+            flash('O campo Turma é obrigatório para Alunos.', 'danger')
+            return render_template('login.html', form_login=form_login, form_cadastro=form_cadastro, form_aluno=form_aluno, form_funcionario=form_funcionario, form_escola=form_escola, form_empresa=form_empresa)
         
-    ### Formulario funcionario ###
-    if 'btn_funcionario' in request.form:
-        if form_funcionario.validate_on_submit():
-            form_funcionario.save(current_user.id)
+        if perfil == 'empresa' and not form_empresa.nome.data:
+            flash('O Nome da Empresa é obrigatório.', 'danger')
+            return render_template('login.html', form_login=form_login, form_cadastro=form_cadastro, form_aluno=form_aluno, form_funcionario=form_funcionario, form_escola=form_escola, form_empresa=form_empresa)
 
+        # 1. Salva o usuário na tabela base (Gera o ID)
+        novo_usuario = form_cadastro.save()
+        
+        if novo_usuario:
+            # 2. Salva na respectiva tabela de perfil usando a ID gerada
+            if perfil == 'aluno':
+                form_aluno.save(id_user=novo_usuario.id)
+            elif perfil == 'empresa':
+                form_empresa.save(id_user=novo_usuario.id)
+            elif perfil == 'escola':
+                form_escola.save(id_user=novo_usuario.id)
+            elif perfil == 'funcionario':
+                form_funcionario.save(id_user=novo_usuario.id)
+            # Loga o usuário criado e manda para o Menu/Feed
+            login_user(novo_usuario, remember=True)
             return redirect(url_for('Menu'))
+        else:
+            flash('Erro ao criar usuário, tente novamente.', 'danger')
+
+    if form_cadastro.errors:
+        print("Erros no Cadastro:", form_cadastro.errors)
+        
+    return render_template('login.html', form_cadastro=form_cadastro, form_login=form_login, form_aluno=form_aluno, form_empresa=form_empresa, form_escola=form_escola, form_funcionario=form_funcionario)
+
+# criando o logout(sair)
+@app.route('/sair/')
+@login_required
+def Logout():
+    logout_user()
     
-    return render_template('menu.html', form_aluno=form_aluno, form_empresa=form_empresa, form_escola=form_escola, form_funcionario=form_funcionario)
+    return redirect(url_for('Login'))
+
+# criando o Menu
+@app.route('/menu-feed', methods=['GET', 'POST'])
+def Menu():
+    # buscando os dados
+    alunos = Aluno.query.all()
+
+    ### instanciando os formularios ##
+    form_vagas = VagasForm()
+
+    ### popularizando formulario ###
+    form_vagas.incritos.choices = [(a.id, a.nome) for a in alunos]  
+
+
+    return render_template('menu.html', form_vagas=form_vagas)

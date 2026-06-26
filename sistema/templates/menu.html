@@ -4,214 +4,52 @@
 
 {% block content %}
     <h1>Pagina Menu</h1>
-    {% if current_user.id_authenticated %}
-        <button type="button" class="btn-danger btn"><a href="{{ url_for('Logout') }}"> Sair </a></button>
+    {% if current_user.is_authenticated %}
+        <a class="btn-danger btn" href="{{ url_for('Logout') }}"> Sair </a>
     {% endif %}
     
+    <hr>
 
-    <section id="cadastro_aluno">
-        <!-- form_aluno -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cadastro_aluno_escola">
-            Cadastar Aluno
+    <!-- Formulario de post -->
+    <section id="Post">
+        <!-- Botão para abrir o modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#postmodal">
+        Fazer um Post
         </button>
 
-        <div class="modal fade" id="cadastro_aluno_escola" tabindex="-1" aria-labelledby="modal" aria-hidden="true">
-            <div class="modal-dialog">
+        <!-- Estrutura do Modal Bootstrap -->
+        <div class="modal fade" id="meuModal" tabindex="-1" aria-labelledby="post_modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="" method="post">
                 <div class="modal-content">
                 
-                <!-- Cabeçalho do Modal -->
                 <div class="modal-header bg-primary">
-                    <h5 class="modal-title" id="modal">Cadastro - Aluno</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    <h5 class="modal-title" id="meuModalLabel">Novo Post</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 
-                <!-- Corpo do Modal -->
-                <form action="" method="post">
-                    <div class="modal-body">
-                        {{ form_aluno.csrf_token }}
+                <div class="modal-body">
+                    {{ form_vagas.csrf_token }}
 
-                        {{ form_aluno.escola.label() }}
-                        {{ form_aluno.escola(class="form-control") }}
-                        
-                        {{ form_aluno.turma.label() }}
-                        {{ form_aluno.turma(class="form-control") }}
-                        
-                        {{ form_aluno.descricao.label() }}
-                        {{ form_aluno.descricao(class="form-control") }}
-                    </div>
-                    
-                    <!-- Rodapé do Modal -->
-                    <div class="modal-footer">
-                        {{ form_aluno.btn_aluno(class="btn btn-success w-100") }}
-                    </div>
-                </form>
+                    {{ form_vagas.titulo.label(class="form-label fw-semibold") }}
+                    {{ form_vagas.titulo(class="form-control form-control-lg", placeholder="Digite o titulo") }} 
+
+                    {{ form_vagas.tipo.label(class="form-label fw-semibold") }}
+                    {{ form_vagas.tipo(class="form-control form-control-lg", placeholder="Digite o titulo") }} 
+
+                    {{ form_vagas.incritos.label(class="form-label fw-semibold") }}
+                    {{ form_vagas.incritos(class="form-control form-control-lg", placeholder="Digite o titulo") }} 
+
+                </div>
+                
+                <div class="modal-footer bg-dark">
+                    {{ form_vagas.btn_vagas(class="btn btn-success w-100 mt-4") }}
+                </div>
                 
                 </div>
-            </div>
+            </form>
+        </div>
         </div>
 
-        <hr>
-    </section>
-
-    <section id="cadastro_funcionario">
-        <!-- form_funcionario -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cadastro_funcionario_escola">
-            Cadastrar Funcionario
-        </button>
-
-        <div class="modal fade" id="cadastro_funcionario_escola" tabindex="-1" aria-labelledby="modal" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                
-                <!-- Cabeçalho do Modal -->
-                <div class="modal-header bg-primary">
-                    <h5 class="modal-title" id="modal">Cadastro - Funcionario</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                
-                <!-- Corpo do Modal -->
-                <form action="" method="post">
-                    <div class="modal-body">
-                        {{ form_funcionario.csrf_token }}
-
-                        {{ form_funcionario.escola.label() }}
-                        {{ form_funcionario.escola(class="form-control") }}
-                        
-                    </div>
-                    
-                    <!-- Rodapé do Modal -->
-                    <div class="modal-footer">
-                        {{ form_funcionario.btn_funcionario(class="btn btn-success w-100") }}
-                    </div>
-                </form>
-                
-                </div>
-            </div>
-        </div>
-
-        <!-- Se for cadastrar para empresa -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cadastro_funcionario_empresa">
-            Cadastrar Funcionario
-        </button>
-
-        <div class="modal fade" id="cadastro_funcionario_empresa" tabindex="-1" aria-labelledby="modal" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                
-                <!-- Cabeçalho do Modal -->
-                <div class="modal-header bg-primary">
-                    <h5 class="modal-title" id="modal">Cadastro - Funcionario</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                
-                <!-- Corpo do Modal -->
-                <form action="" method="post">
-                    <div class="modal-body">
-                        {{ form_funcionario.csrf_token }}
-
-                        {{ form_funcionario.empresa.label() }}
-                        {{ form_funcionario.empresa(class="form-control") }}
-                        
-                    </div>
-                    
-                    <!-- Rodapé do Modal -->
-                    <div class="modal-footer">
-                        {{ form_funcionario.btn_funcionario(class="btn btn-success w-100") }}
-                    </div>
-                </form>
-                
-                </div>
-            </div>
-        </div>
-
-        <hr>
-    </section>
-
-    <section id="cadastro_empresa">
-        <!-- form_empresa -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cadastroempresa">
-            Cadastrar Empresa
-        </button>
-
-        <div class="modal fade" id="cadastroempresa" tabindex="-1" aria-labelledby="modal" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                
-                <!-- Cabeçalho do Modal -->
-                <div class="modal-header bg-primary">
-                    <h5 class="modal-title" id="modal">Cadastro - Empresa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                
-                <!-- Corpo do Modal -->
-                <form action="" method="post">
-                    <div class="modal-body">
-                        {{ form_empresa.csrf_token }}
-
-                        {{ form_empresa.nome.label() }}
-                        {{ form_empresa.nome(class="form-control") }}
-                        
-                        {{ form_empresa.localizacao.label() }}
-                        {{ form_empresa.localizacao(class="form-control") }}
-
-                        {{ form_empresa.contato.label() }}
-                        {{ form_empresa.contato(class="form-control") }}
-                    </div>
-                    
-                    <!-- Rodapé do Modal -->
-                    <div class="modal-footer">
-                        {{ form_empresa.btn_empresa(class="btn btn-success w-100") }}
-                    </div>
-                </form>
-                
-                </div>
-            </div>
-        </div>
-
-        <hr>
-    </section>
-
-    <section id="cadastro_escola">
-        <!-- form_escola -->
-         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cadastroescola">
-            Cadastrar Escola
-        </button>
-
-        <div class="modal fade" id="cadastroescola" tabindex="-1" aria-labelledby="modal" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                
-                <!-- Cabeçalho do Modal -->
-                <div class="modal-header bg-primary">
-                    <h5 class="modal-title" id="modal">Cadastro - Escola</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                
-                <!-- Corpo do Modal -->
-                <form action="" method="post">
-                    <div class="modal-body">
-                        {{ form_escola.csrf_token }}
-
-                        {{ form_escola.nome.label() }}
-                        {{ form_escola.nome(class="form-control") }}
-                        
-                        {{ form_escola.localizacao.label() }}
-                        {{ form_escola.localizacao(class="form-control") }}
-
-                        {{ form_escola.contato.label() }}
-                        {{ form_escola.contato(class="form-control") }}
-                    </div>
-                    
-                    <!-- Rodapé do Modal -->
-                    <div class="modal-footer">
-                        {{ form_escola.btn_escola(class="btn btn-success w-100") }}
-                    </div>
-                </form>
-                
-                </div>
-            </div>
-        </div>
-        
-        <hr>
     </section>
 {% endblock %}

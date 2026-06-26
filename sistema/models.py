@@ -25,7 +25,7 @@ class Usuario(db.Model, UserMixin): # essa tabela vai ter o login
     aluno = db.relationship('Aluno', backref="user_aluno", uselist=False, lazy=True)
     empresa = db.relationship('Empresa', backref="user_empresa", uselist=False, lazy=True)
     escola = db.relationship('Escola', backref="user_escola", uselist=False, lazy=True)
-
+    
 ### ---------Hierarquia Empresa--------- ###
 class Empresa(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -75,3 +75,23 @@ class Aluno(db.Model):
 
     # chave estrangeira escola
     escola_id = db.Column(db.Integer, db.ForeignKey('escola.id'))
+
+### ------------tabela post------------ ###
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    titulo = db.Column(db.String(100), nullable = True)
+    autor = db.Column(db.String(100), nullable = True)
+    tipo = db.Column(db.String(50), nullable = True)
+
+    # relacionamento com filtro no tipo = 'vaga'
+    inscrito = db.relationship('Post', backref="indicado_post", lazy=True)
+    
+### ------------tabela inscritos------------ ###
+class Inscritos(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    
+    # chave estrangeira de vagas
+    vaga = db.Column(db.ForeignKey('post.id'))
+
+    inscrito = db.Column(db.String(100), nullable = True)
+# Colocar cnpj em empresa e escola -> cnpj = db.Column(db.String(14))
