@@ -76,22 +76,46 @@ class Aluno(db.Model):
     # chave estrangeira escola
     escola_id = db.Column(db.Integer, db.ForeignKey('escola.id'))
 
+    # relacionamento de aluno para inscrito
+    candidato = db.relationship('Inscrito', backref="inscrito", lazy=True, )
+
 ### ------------tabela post------------ ###
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     titulo = db.Column(db.String(100), nullable = True)
     autor = db.Column(db.String(100), nullable = True)
     tipo = db.Column(db.String(50), nullable = True)
-
-    # relacionamento com filtro no tipo = 'vaga'
-    inscrito = db.relationship('Post', backref="indicado_post", lazy=True)
+    mensagem = db.Column(db.Text, nullable = True)
     
-### ------------tabela inscritos------------ ###
-class Inscritos(db.Model):
+    # relacionamento com filtro no tipo = 'vagas'
+    candidato = db.relationship('Inscrito', backref="inscrito_post", lazy=True)
+    
+    # relacionamento com filto no tipo = 'projeto'
+    projetos = db.relationship('Projeto', backref="projeto_post", lazy=True)
+
+### ------------tabela inscrito------------ ###
+class Inscrito(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     
     # chave estrangeira de vagas
-    vaga = db.Column(db.ForeignKey('post.id'))
+    post_id = db.Column(db.ForeignKey('post.id'))
+
+    # chave estrangeira de alunos 
+    indicado = db.Column(db.ForeignKey('aluno.id'))
 
     inscrito = db.Column(db.String(100), nullable = True)
+
+    # info do candidato
+    curriculo = db.Column(db.Text, nullable = True)
+
+    
+### ------------tabela Projeto------------ ###
+class Projeto(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    arquivo = db.Column(db.String(200), nullable = True)
+    imagem = db.Column(db.String(200), nullable = True)
+
+    # chave estrangeira de post
+    post_id = db.Column(db.ForeignKey('post.id'))
+    
 # Colocar cnpj em empresa e escola -> cnpj = db.Column(db.String(14))

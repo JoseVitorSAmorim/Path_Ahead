@@ -15,7 +15,7 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 
 # importando as tabelas e o db
 from sistema import db, bcrypt, app
-from sistema.models import Usuario, Empresa, Aluno, Escola, Funcionario, Post # importar as tabelas do models
+from sistema.models import Usuario, Empresa, Aluno, Escola, Funcionario, Post, Inscrito # importar as tabelas do models
 
 # biblioteca usada pra salvar arquivo 
 import os
@@ -153,20 +153,34 @@ class FuncionarioForm(FlaskForm):
         db.session.commit()
         return novo_funcionario
 
-class VagasForm(FlaskForm):
-    titulo = StringField('Titulo da Postagem', validators=[DataRequired()])
-    tipo = SelectField('Categoria', choices=[('postagem', 'Postagem'), ('vagas', 'Vagas'), ('projetos', 'Projetos')])
-    incritos = SelectField('Escolha um Candidato', coerce=int)
-    
-    # botoes de save
-    btn_vagas = SubmitField('Enviar')
-    btn_incrito = SubmitField('Inscrever-se')
+class PostForm(FlaskForm):
+    titulo = StringField('Titulo do Post', validators=[DataRequired()])
+    tipo = SelectField('Categoria da Postagem', choices=[('postagem', 'Postagem'), ('vagas', 'Vagas'), ('projeto', 'Projeto')], validators=[DataRequired()])
+    mensagem = TextAreaField('Conteudo da Postagem', validators=[DataRequired()])
+    btn_post = SubmitField('Enviar')
 
-    # metodos
-    # se for somente postagem
-    def save_post(self, current_user):
+    def save(self, current_user_id):
         novo_post = Post(
             titulo = self.titulo.data,
-            autor = current_user,
-            tipo = self.tipo.data
+            autor = current_user_id,
+            tipo = self.tipo.data,
+            mensagem = self.data.mensagem
         )
+
+        db.session.add(novo_post)
+        db.session.commit()
+
+        return novo_post
+    
+class InscricaoForm(FlaskForm):
+    empresa = SelectField('Selecione uma empresa', coerce=int, validators=[DataRequired()])
+    vaga = SelectField('Selecione uma vaga', coerce=int, validators=[DataRequired()])
+    aluno = SelectField('Selecione um aluno', coerce=int, validators=[DataRequired()])
+    btn_indicar = SubmitField('Indicar')
+    btn_inscrever = SubmitField('Inscrever-se')
+
+    # apos escolher a inscrição esse label aparece
+    dados = TextAreaField('Coloque suas informações', validators=[DataRequired()])
+    
+    def save(self):
+        pass

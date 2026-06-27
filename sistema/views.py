@@ -11,7 +11,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from sistema.models import Usuario, Aluno, Empresa, Escola, Funcionario
 
 # importando as classes de formulario
-from sistema.forms import CadastroForm, LoginForm, AlunoForm, EscolaForm, EmpresaForm, FuncionarioForm, VagasForm
+from sistema.forms import CadastroForm, LoginForm, AlunoForm, EscolaForm, EmpresaForm, FuncionarioForm, PostForm, InscricaoForm
 
 # criando rota de login
 @app.route('/', methods=['GET', 'POST'])
@@ -95,12 +95,16 @@ def Logout():
 def Menu():
     # buscando os dados
     alunos = Aluno.query.all()
-
+    
     ### instanciando os formularios ##
-    form_vagas = VagasForm()
+    form_post = PostForm()
 
-    ### popularizando formulario ###
-    form_vagas.incritos.choices = [(a.id, a.nome) for a in alunos]  
+    ### validando o formulario ###
+    if form_post.validate_on_submit() and 'btn_post' in request.form:
+        form_post.save(current_user.id)
+    
 
 
-    return render_template('menu.html', form_vagas=form_vagas)
+
+    return render_template('menu.html', form_post=form_post)
+
