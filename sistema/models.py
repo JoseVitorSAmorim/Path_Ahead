@@ -99,6 +99,8 @@ class Post(db.Model):
     # relacionamento com filto no tipo = 'projeto'
     projetos = db.relationship('Projeto', backref="projeto_post", lazy=True)
 
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'))
+
 ### ------------tabela inscrito------------ ###
 class Inscrito(db.Model):
     id = db.Column(db.Integer, primary_key = True)

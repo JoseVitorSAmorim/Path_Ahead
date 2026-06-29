@@ -1,76 +1,92 @@
 {% extends 'base.html' %}
 
-{% block titulo %} Menu {% endblock %}
+{% block titulo %} Feed Principal {% endblock %}
 
 {% block content %}
-    <h1>Pagina Menu</h1>
-    {% if current_user.is_authenticated %}
-        <a class="btn-danger btn" href="{{ url_for('Logout') }}"> Sair </a>
-    {% endif %}
-    
-    <hr>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            <form method="GET" action="{{ url_for('Menu') }}" class="mb-4 d-flex">
+                <input type="text" name="search" class="form-control rounded-pill me-2" placeholder="Pesquisar publicações...">
+                <button class="btn btn-seed-azul rounded-pill px-4" type="submit">Buscar</button>
+            </form>
 
-    <!-- Formulario de post -->
-    <section id="Post">
-        <!-- Botão gatilho -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#meuModal">
-        Novo Post
-        </button>
+            <div class="card card-post p-3 mb-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-secondary rounded-circle me-3 text-white d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <button type="button" class="btn btn-light w-100 text-start rounded-pill text-muted border" data-bs-toggle="modal" data-bs-target="#modalNovoPost">
+                        No que você está pensando, {{ current_user.nome }}?
+                    </button>
+                </div>
+            </div>
 
-        <!-- Estrutura do Modal -->
-        <div class="modal fade" id="meuModal" tabindex="-1">
-            <div class="modal-dialog">
-                <form action="" method="post">
-                    <div class="modal-content">
-                    
-                        <div class="modal-header bg-primary">
-                            <h5 class="modal-title">Novo Post...</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            {% for post in posts %}
+            {% if current_user.perfil == 'admin' %}
+                <div class="mt-3 pt-3 border-top d-flex justify-content-end gap-2">
+                    <button class="btn btn-sm btn-warning rounded-pill">
+                        <i class="bi bi-pencil"></i> Editar (Admin)
+                    </button>
+                    <button class="btn btn-sm btn-danger rounded-pill">
+                        <i class="bi bi-trash"></i> Excluir (Admin)
+                    </button>
+                </div>
+            {% endif %}
+            <div class="card card-post p-3 mb-3 border-0 shadow-sm rounded-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-seed-azul rounded-circle me-2 text-white d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                            {{ post.autor[0]|upper if post.autor else 'U' }}
                         </div>
-                        
-                        <div class="modal-body">
-                            {{ form_post.csrf_token }}
-
-                            {{ form_post.titulo.label(class="form-label fw-semibold") }}
-                            {{ form_post.titulo(class="form-control form-control-lg", placeholder="Digite o titulo") }}
-                            
-                            {{ form_post.mensagem.label(class="form-label fw-semibold") }}
-                            {{ form_post.mensagem(class="form-control form-control-lg", placeholder="Digite o conteudo") }}
-
-                            {{ form_post.tipo.label(class="form-label fw-semibold") }}
-                            {{ form_post.tipo(class="form-control form-control-lg") }}
-
-                        </div>
-
-                        <div class="modal-footer bg-dark">
-                            {{ form_post.btn_post(class="btn btn-success w-100") }}
+                        <div>
+                            <h6 class="mb-0 text-seed-azul fw-bold">{{ post.autor }}</h6>
+                            <small class="text-muted"><span class="badge bg-seed-verde">{{ post.tipo }}</span></small>
                         </div>
                     </div>
-                </form>
+                </div>
+                <div class="card-body px-0">
+                    <h5 class="fw-bold text-seed-cinza">{{ post.titulo }}</h5>
+                    <p class="card-text">{{ post.mensagem }}</p>
+                </div>
             </div>
+            {% else %}
+            <p class="text-center text-muted">Nenhuma publicação encontrada.</p>
+            {% endfor %}
+
         </div>
+    </div>
+</div>
 
-        <hr>
-
-        <h1>Post cadastrados</h1>
-
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Titulo</th>
-                    <th>mensagem</th>
-                    <th>Tipo de Post</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for post in posts %}
-                    <tr>
-                        <td>{{ post.titulo }}</td>
-                        <td>{{ post.mensagem }}</td>
-                        <td>{{ post.tipo }}</td>
-                    </tr>
-                {%  endfor %}
-            </tbody>
-        </table>
-    </section>
+<div class="modal fade" id="modalNovoPost" tabindex="-1">
+    <div class="modal-dialog">
+        <form action="" method="post">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header bg-seed-azul text-white">
+                    <h5 class="modal-title">Criar Publicação</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {{ form_post.csrf_token }}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-seed-cinza">Título</label>
+                        {{ form_post.titulo(class="form-control", placeholder="Deixe um título chamativo") }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-seed-cinza">Conteúdo</label>
+                        {{ form_post.mensagem(class="form-control", rows="4", placeholder="Compartilhe suas ideias...") }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-seed-cinza">Categoria</label>
+                        {{ form_post.tipo(class="form-select") }}
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    {{ form_post.btn_post(class="btn btn-seed-verde w-100 rounded-pill") }}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

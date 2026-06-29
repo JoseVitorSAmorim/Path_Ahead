@@ -11,7 +11,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from sistema.models import Usuario, Aluno, Empresa, Escola, Funcionario, Post
 
 # importando as classes de formulario
-from sistema.forms import CadastroForm, LoginForm, AlunoForm, EscolaForm, EmpresaForm, FuncionarioForm, PostForm, InscricaoForm
+from sistema.forms import CadastroForm, LoginForm, AlunoForm, EscolaForm, EmpresaForm, FuncionarioForm, PostForm, InscricaoForm, Projetos
 
 # importando o operador logico "OR"
 from sqlalchemy import or_
@@ -24,7 +24,7 @@ def Login():
     form_login = LoginForm()
 
     # verificando o login
-    if form_login.validate_on_submit() and 'btnsubmit' in request.form:
+    if form_login.validate_on_submit() and 'btn_login' in request.form:
         user = form_login.login()
 
         if user:
@@ -93,22 +93,66 @@ def Logout():
     
     return redirect(url_for('Login'))
 
-# criando o Menu
+# Rota do Feed Principal (Menu)
 @app.route('/menu-feed', methods=['GET', 'POST'])
+@login_required
 def Menu():
-    # buscando os dados
-    alunos = Aluno.query.all()
-    posts = Post.query.all()
-
-    ### instanciando os formularios ##
-    form_post = PostForm()
-
-    ### validando o formulario ###
-    if form_post.validate_on_submit() and 'btn_post' in request.form:
-        form_post.save(current_user.id)
+    search = request.args.get('search')
+    # Filtro de busca simples por título ou conteúdo
+    query = Post.query
+    if search:
+        query = query.filter(or_(Post.titulo.contains(search), Post.mensagem.contains(search)))
     
+    posts = query.all()
+    form_post = PostForm()
+    
+    # Lógica de salvar post...
+    return render_template('menu.html', posts=posts, form_post=form_post)
 
+# Rota de Vagas
+@app.route('/vagas', methods=['GET', 'POST'])
+@login_required
+def Vagas():
+    # Instanciando os formulários
+    form_post = PostForm()
+    form_inscricao = InscricaoForm()
+    
+    # Abastecendo a lista de alunos (se o usuário for escola/funcionário)
+    if current_user.perfil in ['escola', 'funcionario']:
+        alunos = Aluno.query.all()
+        form_inscricao.aluno.choices = [(a.id, a.user_aluno.nome) for a in alunos]
 
+    # Processamento de buscas
+    search = request.args.get('search', '')
+    query = Post.query.filter_by(tipo='vagas')
+    if search:
+        query = query.filter(Post.titulo.contains(search))
+    
+    posts = query.all()
 
-    return render_template('menu.html', form_post=form_post, posts=posts)
+    return render_template('vagas.html', posts=posts, form_post=form_post, form_inscricao=form_inscricao)
+
+@app.route('/projetos', methods=['GET', 'POST'])
+@login_required
+def ProjetosFeed():
+    # Formulário importado do forms.py
+    form_projeto = Projetos()
+    
+    # Tratamento de busca
+    search = request.args.get('search', '')
+    query = Post.query.filter_by(tipo='projeto')
+    if search:
+        query = query.filter(Post.titulo.contains(search))
+    
+    posts = query.all()
+    
+    return render_template('projetos.html', posts=posts, form_projeto=form_projeto)
+
+# Rota de Perfil
+@app.route('/perfil')
+@login_required
+def Perfil():
+    # O current_user já contém os dados do usuário logado
+    return render_template('perfil.html')
+
 
