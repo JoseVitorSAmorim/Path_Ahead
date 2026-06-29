@@ -2,10 +2,10 @@
 from flask_wtf import FlaskForm
 
 # importando o current app para pegar a pasta raiz
-from flask import current_app
+from flask import current_app, request
 
 # importando o tipo de campo e os validators
-from wtforms import StringField, EmailField, PasswordField, SubmitField, PasswordField, IntegerField, SelectField, TextAreaField
+from wtforms import StringField, EmailField, PasswordField, SubmitField, PasswordField, IntegerField, SelectField, TextAreaField, DateTimeField
 
 # importando os campos de arquivo
 from flask_wtf.file import FileField, FileAllowed, FileRequired, MultipleFileField
@@ -15,7 +15,7 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 
 # importando as tabelas e o db
 from sistema import db, bcrypt, app
-from sistema.models import Usuario, Empresa, Aluno, Escola, Funcionario, Post, Inscrito # importar as tabelas do models
+from sistema.models import Usuario, Empresa, Aluno, Escola, Funcionario, Post, Inscrito, Projeto # importar as tabelas do models
 
 # biblioteca usada pra salvar arquivo 
 import os
@@ -157,6 +157,7 @@ class PostForm(FlaskForm):
     titulo = StringField('Titulo do Post', validators=[DataRequired()])
     tipo = SelectField('Categoria da Postagem', choices=[('postagem', 'Postagem'), ('vagas', 'Vagas'), ('projeto', 'Projeto')], validators=[DataRequired()])
     mensagem = TextAreaField('Conteudo da Postagem', validators=[DataRequired()])
+    prazo = DateTimeField('Defina o Prazo')
     btn_post = SubmitField('Enviar')
 
     def save(self, current_user_id):
@@ -164,7 +165,8 @@ class PostForm(FlaskForm):
             titulo = self.titulo.data,
             autor = current_user_id,
             tipo = self.tipo.data,
-            mensagem = self.data.mensagem
+            mensagem = self.mensagem.data,
+            validade = self.prazo.data
         )
 
         db.session.add(novo_post)
@@ -173,14 +175,90 @@ class PostForm(FlaskForm):
         return novo_post
     
 class InscricaoForm(FlaskForm):
-    empresa = SelectField('Selecione uma empresa', coerce=int, validators=[DataRequired()])
-    vaga = SelectField('Selecione uma vaga', coerce=int, validators=[DataRequired()])
-    aluno = SelectField('Selecione um aluno', coerce=int, validators=[DataRequired()])
+    empresa = SelectField('Selecione uma empresa', coerce=int)
+    vaga = SelectField('Selecione uma vaga', coerce=int)
+    aluno = SelectField('Selecione um aluno', coerce=int)
     btn_indicar = SubmitField('Indicar')
     btn_inscrever = SubmitField('Inscrever-se')
 
     # apos escolher a inscrição esse label aparece
-    dados = TextAreaField('Coloque suas informações', validators=[DataRequired()])
+    dados = TextAreaField('Coloque suas informações')
     
-    def save(self):
-        pass
+    # se o aluno se inscrever 
+    def save_inscrito(self, current_user_id):
+        novo_inscrito = Inscrito(
+            empresa = self.empresa.data,
+            post_id = self.vaga.data,
+            inscrito = current_user_id,
+            curriculo = self.dados.data
+        )
+
+        db.session.add(novo_inscrito)
+        db.session.commit()
+
+        return novo_inscrito
+    
+    # se o aluno for indicado
+    def save_indicado(self):
+        novo_indicado = Inscrito(
+            empresa = self.empresa.data,
+            post_id = self.vaga.data,
+            indicado = self.aluno.data,
+        )
+
+        db.session.add(novo_indicado)
+        db.session.commit()
+
+class Projetos(FlaskForm):
+    imagem = FileField('Imagem do Projeto', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Apenas imagens!')])
+    arquivos_pasta = MultipleFileField('Arquivos da Pasta')
+
+    btn_projeto = SubmitField('Enviar')
+
+    def save(self, post_id_vinculado):
+        nome_imagem_salva = None
+        caminho_pasta_salva = None
+
+        # 1. Processa e salva a Imagem Única
+        if self.imagem.data:
+            arquivo_img = self.imagem.data
+            # Gera um nome seguro incluindo o ID do post para evitar duplicatas
+            nome_img_seguro = secure_filename(f"projeto_{post_id_vinculado}_{arquivo_img.filename}")
+            caminho_img = os.path.join(current_app.config['UPLOAD_FOLDER'], 'imagens', nome_img_seguro)
+            arquivo_img.save(caminho_img)
+            nome_imagem_salva = nome_img_seguro
+
+        # 2. Processa e salva a Pasta de Arquivos
+        # Pegamos a lista real de múltiplos arquivos enviados via request
+        arquivos = request.files.getlist('arquivos_pasta')
+        
+        # Verifica se pelo menos um arquivo válido foi enviado
+        if arquivos and arquivos[0].filename != '':
+            # Cria uma pasta exclusiva para este projeto no servidor
+            nome_pasta_projeto = f"arquivos_projeto_{post_id_vinculado}"
+            caminho_diretorio_projeto = os.path.join(current_app.config['UPLOAD_FOLDER'], 'projetos', nome_pasta_projeto)
+            os.makedirs(caminho_diretorio_projeto, exist_ok=True)
+
+            for arquivo in arquivos:
+                if arquivo.filename == '':
+                    continue
+                
+                # Extrai apenas o nome final do arquivo para segurança
+                nome_arq_seguro = secure_filename(os.path.basename(arquivo.filename))
+                caminho_final_arquivo = os.path.join(caminho_diretorio_projeto, nome_arq_seguro)
+                arquivo.save(caminho_final_arquivo)
+            
+            # Caminho relativo que será guardado no banco de dados para fácil acesso depois
+            caminho_pasta_salva = os.path.join('uploads', 'projetos', nome_pasta_projeto)
+
+        # 3. Cria e salva o registro na tabela Projeto do Banco de Dados
+        novo_projeto = Projeto(
+            imagem = nome_imagem_salva,
+            arquivo = caminho_pasta_salva,
+            post_id = post_id_vinculado
+        )
+        
+        db.session.add(novo_projeto)
+        db.session.commit()
+        
+        return novo_projeto

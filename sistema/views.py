@@ -8,10 +8,13 @@ from flask import render_template, url_for, request, redirect, flash
 from flask_login import login_user, logout_user, current_user, login_required
 
 # importando a classe da tabela onde vou salvar
-from sistema.models import Usuario, Aluno, Empresa, Escola, Funcionario
+from sistema.models import Usuario, Aluno, Empresa, Escola, Funcionario, Post
 
 # importando as classes de formulario
 from sistema.forms import CadastroForm, LoginForm, AlunoForm, EscolaForm, EmpresaForm, FuncionarioForm, PostForm, InscricaoForm
+
+# importando o operador logico "OR"
+from sqlalchemy import or_
 
 # criando rota de login
 @app.route('/', methods=['GET', 'POST'])
@@ -95,7 +98,8 @@ def Logout():
 def Menu():
     # buscando os dados
     alunos = Aluno.query.all()
-    
+    posts = Post.query.all()
+
     ### instanciando os formularios ##
     form_post = PostForm()
 
@@ -106,5 +110,5 @@ def Menu():
 
 
 
-    return render_template('menu.html', form_post=form_post)
+    return render_template('menu.html', form_post=form_post, posts=posts)
 

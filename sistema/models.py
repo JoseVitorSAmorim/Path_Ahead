@@ -39,6 +39,9 @@ class Empresa(db.Model):
     # relacionamento 
     funcionario = db.relationship('Funcionario', backref="empresa_funcionario", lazy=True)
 
+    # relacionamento de posts.vagas para empresa
+    post = db.relationship('Post', backref="empresa_post", lazy=True)
+
 ### -----------Tabela de funcionario base----------- ###
 class Funcionario(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -77,7 +80,7 @@ class Aluno(db.Model):
     escola_id = db.Column(db.Integer, db.ForeignKey('escola.id'))
 
     # relacionamento de aluno para inscrito
-    candidato = db.relationship('Inscrito', backref="inscrito", lazy=True, )
+    candidato = db.relationship('Inscrito', backref="aluno_candidato", lazy=True, )
 
 ### ------------tabela post------------ ###
 class Post(db.Model):
@@ -86,6 +89,9 @@ class Post(db.Model):
     autor = db.Column(db.String(100), nullable = True)
     tipo = db.Column(db.String(50), nullable = True)
     mensagem = db.Column(db.Text, nullable = True)
+    
+    # se for do tipo vaga tera prazo
+    validade = db.Column(db.DateTime, nullable = True)
     
     # relacionamento com filtro no tipo = 'vagas'
     candidato = db.relationship('Inscrito', backref="inscrito_post", lazy=True)
@@ -103,6 +109,9 @@ class Inscrito(db.Model):
     # chave estrangeira de alunos 
     indicado = db.Column(db.ForeignKey('aluno.id'))
 
+    # chave estrangeira de empresa
+    empresa = db.Column(db.ForeignKey('empresa.id') )
+
     inscrito = db.Column(db.String(100), nullable = True)
 
     # info do candidato
@@ -117,5 +126,6 @@ class Projeto(db.Model):
 
     # chave estrangeira de post
     post_id = db.Column(db.ForeignKey('post.id'))
+    
     
 # Colocar cnpj em empresa e escola -> cnpj = db.Column(db.String(14))
